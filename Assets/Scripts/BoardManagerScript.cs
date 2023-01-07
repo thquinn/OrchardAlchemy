@@ -1,3 +1,4 @@
+using Assets.Code;
 using Assets.Code.Model;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,9 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class BoardManagerScript : MonoBehaviour {
-    public GameObject prefabEntity, prefabGadgetRow;
-
-    public RectTransform rectTransformGadgetPanel;
+    public GameObject prefabEntity;
 
     Camera cam;
     public State state;
@@ -20,8 +19,6 @@ public class BoardManagerScript : MonoBehaviour {
         state = new State();
         entityScripts = new Dictionary<Entity, EntityScript>();
         EntityCheck();
-
-        AddGadgetRow(new EntityFlinger(null, Vector2Int.zero));
     }
 
     void Update() {
@@ -74,7 +71,7 @@ public class BoardManagerScript : MonoBehaviour {
             }
             
         }
-        if (!Input.GetMouseButton(0)) {
+        if (!Input.GetMouseButton(0) || !IsDraggableType(draggedEntity.type)) {
             draggedEntity.coor = coor;
             if (!state.SpawnEntity(draggedEntity)) {
                 state.StoreEntity(draggedEntity);
@@ -89,18 +86,19 @@ public class BoardManagerScript : MonoBehaviour {
         draggedEntityScript.transform.localPosition = worldMousePosition;
     }
     bool IsDraggableType(EntityType type) {
+        if (state.progression.phase == ProgressionPhase.TutorialFlinger || state.progression.phase == ProgressionPhase.TutorialBlocker) {
+            return type == EntityType.Gadget;
+        }
         return type == EntityType.Gadget || type == EntityType.Fruit;
     }
 
-    void AddGadgetRow(EntityGadget gadget) {
-        Instantiate(prefabGadgetRow, rectTransformGadgetPanel).GetComponent<GadgetRowScript>().Init(this, gadget);
-    }
     public void DragNewGadget(EntityGadget gadget) {
-        if (gadget is EntityFlinger) {
-            gadget = new EntityFlinger(state, Vector2Int.zero);
-        } else {
-            throw new System.Exception("Unknown gadget type: " + gadget.name);
+        // Pay or remove from storage.
+        if (state.storedGadgets.ContainsKey(gadget.subtype)) {
+            state.UnstoreEntity(gadget);
         }
+        // Create and drag.
+        gadget = Util.GetGadgetInstanceFromSubtype(gadget.subtype);
         draggedEntity = gadget;
         draggedEntityScript = Instantiate(prefabEntity, transform).GetComponent<EntityScript>();
         draggedEntityScript.Init(gadget);

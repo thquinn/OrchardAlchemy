@@ -10,30 +10,82 @@ namespace Assets.Code.Model {
         static ulong[] WALLET_SIZES = new ulong[] { 100*100, 500*100, 2500*100, 10000*100 };
         static ulong[] FRUIT_WALLET_SIZES = new ulong[] { 10, 50, 250 };
 
-        // TREES
-        public static Vector3Int[] TREE_APPLE = new Vector3Int[] {
-            new Vector3Int(4, 1, 1),
+        // GADGET COSTS
+        static Dictionary<EntitySubtype, GadgetCost[]> GADGET_COSTS = new Dictionary<EntitySubtype, GadgetCost[]>() {
+            { EntitySubtype.Flinger, new GadgetCost[] {
+                new GadgetCost(10, null),
+            } },
+            { EntitySubtype.Blocker, new GadgetCost[] {
+                new GadgetCost(5, null),
+            } }
         };
 
+        // TREES
+        static Vector3Int[] TREE_APPLE = new Vector3Int[] {
+            new Vector3Int(4, 1, 1),
+        };
+        static Vector3Int[] TREE_PEAR = new Vector3Int[] {
+            new Vector3Int(5, 1, 1),
+        };
+
+        // COORDINATES
+        static Vector2Int COOR_FIRST_TREE = new Vector2Int(-5, 0);
+        static Vector2Int COOR_TUTORIAL_FLINGER_MARKET = new Vector2Int(5, 0);
+        static Vector2Int COOR_TUTORIAL_BLOCKER_MARKET = new Vector2Int(0, 8);
+        static Vector2Int COOR_TUTORIAL_BLOCKER_POSITION = new Vector2Int(1, 0);
+        static Vector2Int COOR_SECOND_TREE = new Vector2Int(5, 0);
+
         State state;
+        public ProgressionPhase phase;
         public ulong maxCents, maxFruit;
         public int walletSizeIndex, fruitWalletSizeIndex;
+        public Dictionary<EntitySubtype, GadgetCost> gadgetCosts;
+        public Dictionary<EntitySubtype, int> gadgetCostIndex;
+        public Vector2Int[] highlightCoors;
 
         public Progression(State state) {
             this.state = state;
             maxCents = WALLET_SIZES[0];
             maxFruit = FRUIT_WALLET_SIZES[0];
+            gadgetCosts = new Dictionary<EntitySubtype, GadgetCost>();
 
-            state.SpawnTree(new Vector2Int(-5, 0), TREE_APPLE, new Vector2Int[] { Vector2Int.right });
-            state.SpawnEntity(new EntityMarket(state, new Vector2Int(5, 0)));
+            state.SpawnTree(COOR_FIRST_TREE, TREE_APPLE, new Vector2Int[] { Vector2Int.right });
+            state.SpawnEntity(new EntityMarket(state, COOR_TUTORIAL_FLINGER_MARKET));
         }
 
         public void Tick() {
-
+            if (phase == ProgressionPhase.Start && state.totalCentsEarned >= 300) {
+                phase = ProgressionPhase.TutorialFlinger;
+                state.StoreGadgetType(EntitySubtype.Flinger);
+                highlightCoors = new Vector2Int[] { COOR_FIRST_TREE + Vector2Int.right * 2 };
+            } else if (phase == ProgressionPhase.TutorialFlinger && state.storedGadgets[EntitySubtype.Flinger] == 0 && state.totalCentsEarned >= 600) {
+                phase = ProgressionPhase.TutorialBlocker;
+                state.RemoveEntityAtCoor(COOR_TUTORIAL_FLINGER_MARKET);
+                state.SpawnEntity(new EntityMarket(state, COOR_TUTORIAL_BLOCKER_MARKET));
+                state.StoreGadgetType(EntitySubtype.Blocker);
+                highlightCoors = new Vector2Int[] { COOR_TUTORIAL_BLOCKER_POSITION };
+            } else if (phase == ProgressionPhase.TutorialBlocker && state.totalCentsEarned >= 1000) {
+                state.SpawnTree(COOR_SECOND_TREE, TREE_PEAR, new Vector2Int[] { Vector2Int.left });
+                phase = ProgressionPhase.SecondTree;
+                highlightCoors = null;
+            }
         }
     }
 
-    public class GadgetCost {
+    public enum ProgressionPhase : int {
+        Start = 0,
+        TutorialFlinger = 1,
+        TutorialBlocker = 2,
+        SecondTree = 3,
+    }
 
+    public class GadgetCost {
+        public int cents;
+        public Vector2Int[] massesAndAmounts;
+
+        public GadgetCost(int cents, params Vector2Int[] massesAndAmounts) {
+            this.cents = cents;
+            this.massesAndAmounts = massesAndAmounts ?? new Vector2Int[0];
+        }
     }
 }

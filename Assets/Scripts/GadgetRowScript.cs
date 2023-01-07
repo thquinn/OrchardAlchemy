@@ -17,7 +17,10 @@ public class GadgetRowScript : MonoBehaviour
     public TextMeshProUGUI tmpName, tmpMoneyCost;
     public Image gadgetIcon;
 
+    State state;
+
     public void Init(BoardManagerScript boardManagerScript, EntityGadget gadget) {
+        state = boardManagerScript.state;
         tmpName.text = gadget.name;
         gadgetIcon.sprite = gadgetIcons.First(i => i.name == "icon_gadget_" + gadget.name.ToLower());
         EventTrigger.Entry entry = new EventTrigger.Entry();

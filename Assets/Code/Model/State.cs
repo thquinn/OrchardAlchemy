@@ -7,8 +7,9 @@ using UnityEngine;
 
 namespace Assets.Code.Model {
     public class State {
-        public ulong cents, totalCentsEarned;
         public Dictionary<Vector2Int, Entity> entities;
+        public ulong cents, totalCentsEarned;
+        public Dictionary<int, int> fruitProcessedCounts;
         public Dictionary<int, ulong> storedFruit;
         public Dictionary<EntitySubtype, ulong> storedGadgets;
         public Progression progression;
@@ -16,6 +17,7 @@ namespace Assets.Code.Model {
 
         public State() {
             entities = new Dictionary<Vector2Int, Entity>();
+            fruitProcessedCounts = new Dictionary<int, int>();
             storedFruit = new Dictionary<int, ulong>();
             storedGadgets = new Dictionary<EntitySubtype, ulong>();
             progression = new Progression(this);
@@ -49,6 +51,7 @@ namespace Assets.Code.Model {
         public bool SpawnEntity(Entity entity) {
             if (!entities.ContainsKey(entity.coor)) {
                 entities[entity.coor] = entity;
+                entity.state = this;
                 return true;
             }
             return false;
@@ -65,6 +68,11 @@ namespace Assets.Code.Model {
         public void RemoveEntity(Entity entity) {
             entity.state = null;
             entities.Remove(entity.coor);
+        }
+        public void RemoveEntityAtCoor(Vector2Int coor) {
+            if (entities.ContainsKey(coor)) {
+                RemoveEntity(entities[coor]);
+            }
         }
 
         public void GetMoney(ulong gained, bool clamp = true) {
@@ -83,11 +91,32 @@ namespace Assets.Code.Model {
                     storedFruit[mass]++;
                 }
             } else if (entity.type == EntityType.Gadget) {
-                if (!storedGadgets.ContainsKey(entity.subtype)) {
-                    storedGadgets[entity.subtype] = 1;
-                } else {
-                    storedGadgets[entity.subtype]++;
+                StoreGadgetType(entity.subtype);
+            }
+        }
+        public void StoreGadgetType(EntitySubtype subtype) {
+            if (!storedGadgets.ContainsKey(subtype)) {
+                storedGadgets[subtype] = 1;
+            } else {
+                storedGadgets[subtype]++;
+            }
+        }
+        public void UnstoreEntity(Entity entity) {
+            if (entity.type == EntityType.Fruit) {
+                int mass = (entity as EntityFruit).mass;
+                storedFruit[mass]--;
+                if (storedFruit[mass] == 0) {
+                    storedFruit.Remove(mass);
                 }
+            } else if (entity.type == EntityType.Gadget) {
+                storedGadgets[entity.subtype]--;
+            }
+        }
+        public void CountProcessedFruit(EntityFruit fruit) {
+            if (!fruitProcessedCounts.ContainsKey(fruit.mass)) {
+                fruitProcessedCounts[fruit.mass] = 1;
+            } else {
+                fruitProcessedCounts[fruit.mass]++;
             }
         }
 

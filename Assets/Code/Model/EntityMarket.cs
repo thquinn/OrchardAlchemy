@@ -7,36 +7,38 @@ using UnityEngine;
 
 namespace Assets.Code.Model {
     public class EntityMarket : EntityFixture {
-        List<Entity> lastTurnFruit;
+        List<Entity> presentAtStart;
 
         public EntityMarket(State board, Vector2Int coor) : base(board, coor, "Market") {
-            lastTurnFruit = new List<Entity>();
+            presentAtStart = new List<Entity>();
         }
 
-        public override void TickConsume() {
-            List<Entity> eligibleFruit = null;
-            if (lastTurnFruit.Count > 0) {
-                eligibleFruit = lastTurnFruit;
-                lastTurnFruit = new List<Entity>();
-            }
+        public override void TickStart() {
+            base.TickStart();
+            presentAtStart.Clear();
             foreach (Vector2Int direction in Util.ALL_DIRECTIONS) {
                 Vector2Int fruitCoor = coor + direction;
                 if (state.GetTypeAtCoor(fruitCoor) == EntityType.Fruit) {
-                    lastTurnFruit.Add(state.entities[fruitCoor]);
+                    presentAtStart.Add(state.entities[fruitCoor]);
                 }
             }
-            // Sell.
-            if (eligibleFruit != null) {
-                var fruitToSell = eligibleFruit.Where(f => lastTurnFruit.Contains(f)).Cast<EntityFruit>();
-                foreach (EntityFruit fruit in fruitToSell) {
-                    state.GetMoney((ulong) GetFruitPrice(fruit));
-                    state.RemoveEntity(fruit);
+        }
+        public override void TickConsume() {
+            foreach (Vector2Int direction in Util.ALL_DIRECTIONS) {
+                Vector2Int fruitCoor = coor + direction;
+                if (state.GetTypeAtCoor(fruitCoor) == EntityType.Fruit) {
+                    EntityFruit fruit = state.entities[fruitCoor] as EntityFruit;
+                    if (presentAtStart.Contains(fruit)) {
+                        state.GetMoney((ulong)GetFruitPrice(fruit));
+                        state.RemoveEntity(fruit);
+                        state.CountProcessedFruit(fruit);
+                    }
                 }
             }
         }
 
         int GetFruitPrice(EntityFruit fruit) {
-            return Mathf.FloorToInt(Mathf.Pow(fruit.mass / 4, 1.1f) * 100);
+            return Mathf.FloorToInt(Mathf.Pow(fruit.mass / 4f, 1.1f) * 100);
         }
     }
 }

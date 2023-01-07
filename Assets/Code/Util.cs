@@ -7,6 +7,18 @@ using UnityEngine;
 
 namespace Assets.Code {
     public static class Util {
+        public static EntityGadget GetGadgetInstanceFromSubtype(EntitySubtype subtype) {
+            if (subtype == EntitySubtype.Blocker) {
+                return new EntityBlocker(null, Vector2Int.zero);
+            } else if (subtype == EntitySubtype.Flinger) {
+                return new EntityFlinger(null, Vector2Int.zero);
+            } else if (subtype == EntitySubtype.Fuser) {
+                return new EntityFuser(null, Vector2Int.zero);
+            } else {
+                throw new System.Exception("Unknown gadget subtype: " + subtype);
+            }
+        }
+
         public static string GetFruitNameFromMass(int mass) {
             if (FRUIT_MASS_TO_INFO.ContainsKey(mass)) {
                 return FRUIT_MASS_TO_INFO[mass].name;
