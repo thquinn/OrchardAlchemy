@@ -33,7 +33,7 @@ namespace Assets.Code.Model {
     public enum EntitySubtype {
         None,
         // Gadget subtypes.
-        Blocker,
+        Blocker, Flinger, Fuser,
         // Fixture subtypes.
         Market,
     }

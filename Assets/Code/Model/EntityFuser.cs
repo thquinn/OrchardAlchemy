@@ -10,6 +10,7 @@ namespace Assets.Code.Model {
         List<Entity> presentAtStart;
 
         public EntityFuser(State board, Vector2Int coor) : base(board, coor, "Fuser") {
+            subtype = EntitySubtype.Fuser;
             presentAtStart = new List<Entity>();
         }
 
@@ -32,8 +33,8 @@ namespace Assets.Code.Model {
                     EntityFruit source1 = state.entities[coor + Util.ALL_DIRECTIONS[i]] as EntityFruit;
                     EntityFruit source2 = state.entities[coor + Util.ALL_DIRECTIONS[(i + 1) % 4]] as EntityFruit;
                     if (source1.reactivity > 0 && source2.reactivity > 0 && presentAtStart.Contains(source1) && presentAtStart.Contains(source2)) {
-                        state.ConsumeEntity(source1);
-                        state.ConsumeEntity(source2);
+                        state.RemoveEntity(source1);
+                        state.RemoveEntity(source2);
                         state.SpawnFruit(coor + Util.ALL_DIRECTIONS[(i + 2) % 4], source1.mass + source2.mass, Mathf.Min(source1.reactivity, source2.reactivity) - 1);
                         return;
                     }

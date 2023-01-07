@@ -29,8 +29,8 @@ namespace Assets.Code.Model {
             if (eligibleFruit != null) {
                 var fruitToSell = eligibleFruit.Where(f => lastTurnFruit.Contains(f)).Cast<EntityFruit>();
                 foreach (EntityFruit fruit in fruitToSell) {
-                    state.GetMoney(GetFruitPrice(fruit));
-                    state.ConsumeEntity(fruit);
+                    state.GetMoney((ulong) GetFruitPrice(fruit));
+                    state.RemoveEntity(fruit);
                 }
             }
         }

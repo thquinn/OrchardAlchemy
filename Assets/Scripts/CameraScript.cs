@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public class CameraScript : MonoBehaviour
 {
-    static float SCROLL_STRENGTH = 2;
+    static float SCROLL_STRENGTH = 1.5f;
     static float MIN_SIZE = 3, MAX_SIZE = 40;
 
     public Camera cam;
@@ -15,7 +15,7 @@ public class CameraScript : MonoBehaviour
     void Update() {
         Vector3 mouseWorldPosition = cam.ScreenToWorldPoint(Input.mousePosition);
         // Pan.
-        if (Input.GetMouseButton(2)) {
+        if (Input.GetMouseButton(1) || Input.GetMouseButton(2)) {
             if (lastDragPosition != null) {
                 transform.Translate(lastDragPosition.GetValueOrDefault() - mouseWorldPosition);
                 mouseWorldPosition = cam.ScreenToWorldPoint(Input.mousePosition);

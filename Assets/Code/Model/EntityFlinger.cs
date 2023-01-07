@@ -9,7 +9,9 @@ namespace Assets.Code.Model {
     public class EntityFlinger : EntityGadget {
         static int FLING_DISTANCE = 8;
 
-        public EntityFlinger(State board, Vector2Int coor) : base(board, coor, "Flinger") { }
+        public EntityFlinger(State board, Vector2Int coor) : base(board, coor, "Flinger") {
+            subtype = EntitySubtype.Flinger;
+        }
 
         public override void TickThrow() {
             foreach (Vector2Int direction in Util.ALL_DIRECTIONS) {

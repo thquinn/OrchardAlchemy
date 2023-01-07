@@ -7,22 +7,22 @@ using UnityEngine;
 
 namespace Assets.Code.Model {
     public class State {
-        public int cents, totalCentsEarned;
+        public ulong cents, totalCentsEarned;
         public Dictionary<Vector2Int, Entity> entities;
+        public Dictionary<int, ulong> storedFruit;
+        public Dictionary<EntitySubtype, ulong> storedGadgets;
+        public Progression progression;
         List<PendingThrow> pendingThrows;
 
         public State() {
             entities = new Dictionary<Vector2Int, Entity>();
+            storedFruit = new Dictionary<int, ulong>();
+            storedGadgets = new Dictionary<EntitySubtype, ulong>();
+            progression = new Progression(this);
             pendingThrows = new List<PendingThrow>();
-
-            Vector3Int[] fruitTypesAndWeights = new Vector3Int[] {
-                new Vector3Int(4, 1, 1),
-            };
-            Vector3Int[] fruitTypesAndWeights2 = new Vector3Int[] {
-                new Vector3Int(5, 1, 1),
-            };
-            SpawnTree(new Vector2Int(-5, 0), fruitTypesAndWeights, new Vector2Int[] { Vector2Int.right });
             /*
+            SpawnTree(new Vector2Int(-5, 0), fruitTypesAndWeights, new Vector2Int[] { Vector2Int.right });
+            SpawnEntity(new EntityMarket(this, new Vector2Int(10, 4)));
             SpawnEntity(new EntityFlinger(this, new Vector2Int(-3, 0)));
             SpawnEntity(new EntityFuser(this, new Vector2Int(1, 4)));
             SpawnTree(new Vector2Int(5, 0), fruitTypesAndWeights2, new Vector2Int[] { Vector2Int.left });
@@ -32,7 +32,6 @@ namespace Assets.Code.Model {
             SpawnEntity(new EntityBlocker(this, new Vector2Int(1, 5)));
             SpawnEntity(new EntityBlocker(this, new Vector2Int(0, 5)));
             SpawnEntity(new EntityFlinger(this, new Vector2Int(3, 4)));
-            SpawnEntity(new EntityMarket(this, new Vector2Int(10, 4)));
             */
         }
 
@@ -47,10 +46,12 @@ namespace Assets.Code.Model {
             pendingThrows.Add(new PendingThrow(entity, direction, distance));
         }
 
-        public void SpawnEntity(Entity entity) {
+        public bool SpawnEntity(Entity entity) {
             if (!entities.ContainsKey(entity.coor)) {
                 entities[entity.coor] = entity;
+                return true;
             }
+            return false;
         }
         public void SpawnTree(Vector2Int coor, Vector3Int[] fruitTypesAndWeights, Vector2Int[] directions) {
             EntityTree tree = new EntityTree(this, coor, fruitTypesAndWeights, directions);
@@ -61,14 +62,33 @@ namespace Assets.Code.Model {
             SpawnEntity(fruit);
         }
 
-        public void ConsumeEntity(Entity entity) {
+        public void RemoveEntity(Entity entity) {
             entity.state = null;
             entities.Remove(entity.coor);
         }
 
-        public void GetMoney(int cents) {
-            this.cents += cents;
-            totalCentsEarned += cents;
+        public void GetMoney(ulong gained, bool clamp = true) {
+            if (cents + gained > progression.maxCents) {
+                gained = progression.maxCents - cents;
+            }
+            cents += gained;
+            totalCentsEarned += gained;
+        }
+        public void StoreEntity(Entity entity) {
+            if (entity.type == EntityType.Fruit) {
+                int mass = (entity as EntityFruit).mass;
+                if (!storedFruit.ContainsKey(mass)) {
+                    storedFruit[mass] = 1;
+                } else {
+                    storedFruit[mass]++;
+                }
+            } else if (entity.type == EntityType.Gadget) {
+                if (!storedGadgets.ContainsKey(entity.subtype)) {
+                    storedGadgets[entity.subtype] = 1;
+                } else {
+                    storedGadgets[entity.subtype]++;
+                }
+            }
         }
 
         public void Tick() {
@@ -86,6 +106,7 @@ namespace Assets.Code.Model {
             foreach (Entity entity in entitiesThisTurn) {
                 entity.TickSpawn();
             }
+            progression.Tick();
         }
         void PerformPendingThrows() {
             // Sort throws, giving priority to right -> up -> left -> down.

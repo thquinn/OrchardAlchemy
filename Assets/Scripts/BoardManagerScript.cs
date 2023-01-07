@@ -2,6 +2,7 @@ using Assets.Code.Model;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class BoardManagerScript : MonoBehaviour {
     public GameObject prefabEntity, prefabGadgetRow;
@@ -60,13 +61,24 @@ public class BoardManagerScript : MonoBehaviour {
     }
 
     void UpdateDraggedEntity() {
-        if (draggedEntity == null) {
-            return;
-        }
         Vector3 worldMousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
+        Vector2Int coor = new Vector2Int(Mathf.RoundToInt(worldMousePosition.x), Mathf.RoundToInt(worldMousePosition.y));
+        if (draggedEntity == null) {
+            if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject() && IsDraggableType(state.GetTypeAtCoor(coor))) {
+                draggedEntity = state.entities[coor];
+                state.RemoveEntity(draggedEntity);
+                draggedEntityScript = entityScripts[draggedEntity];
+                entityScripts.Remove(draggedEntity);
+            } else {
+                return;
+            }
+            
+        }
         if (!Input.GetMouseButton(0)) {
-            draggedEntity.coor = new Vector2Int(Mathf.RoundToInt(worldMousePosition.x), Mathf.RoundToInt(worldMousePosition.y));
-            state.SpawnEntity(draggedEntity);
+            draggedEntity.coor = coor;
+            if (!state.SpawnEntity(draggedEntity)) {
+                state.StoreEntity(draggedEntity);
+            }
             EntityCheck();
             draggedEntity = null;
             Destroy(draggedEntityScript.gameObject);
@@ -75,6 +87,9 @@ public class BoardManagerScript : MonoBehaviour {
         }
         worldMousePosition.z = -10;
         draggedEntityScript.transform.localPosition = worldMousePosition;
+    }
+    bool IsDraggableType(EntityType type) {
+        return type == EntityType.Gadget || type == EntityType.Fruit;
     }
 
     void AddGadgetRow(EntityGadget gadget) {

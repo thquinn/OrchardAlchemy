@@ -7,7 +7,7 @@ public class FruitCostRowScript : MonoBehaviour
 {
     public TextMeshProUGUI tmpMass, tmpQuantity;
 
-    public void Init(int mass, int quantity) {
+    public void Init(int mass, ulong quantity) {
         tmpMass.text = mass.ToString();
         tmpQuantity.text = quantity.ToString();
     }

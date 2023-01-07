@@ -96,6 +96,9 @@ public class EntityFruitHandler : EntityScriptHandler {
     }
 
     public override void Update() {
+        if (fruit.state == null) {
+            return;
+        }
         Vector3 newPosition = Vector3.SmoothDamp(script.transform.localPosition, new Vector3(fruit.coor.x, fruit.coor.y), ref velocity, .1f);
         newPosition.z = new Vector2(velocity.x, velocity.y).sqrMagnitude * -.01f;
         script.transform.localPosition = newPosition;
