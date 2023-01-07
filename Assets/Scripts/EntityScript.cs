@@ -3,12 +3,15 @@ using Assets.Code.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
 public class EntityScript : MonoBehaviour
 {
-    public SpriteRenderer rendererTop, rendererSide, rendererShadow, rendererWoodGrain, rendererGradient;
+    public Sprite[] icons;
+
+    public SpriteRenderer rendererTop, rendererSide, rendererShadow, rendererWoodGrain, rendererGradient, rendererIcon;
     public TextMeshPro tmpName, tmpMass;
     public GameObject directionArrows;
     public SpriteRenderer rendererArrowRight, rendererArrowUp, rendererArrowLeft, rendererArrowDown;
@@ -20,6 +23,7 @@ public class EntityScript : MonoBehaviour
         rendererTop.color = Util.ShiftColorToEntityType(rendererTop.color, entity.type);
         rendererSide.color = Util.ShiftColorToEntityType(rendererSide.color, entity.type);
         tmpName.color = Util.ShiftColorToEntityType(tmpName.color, entity.type);
+        rendererIcon.color = Util.ShiftColorToEntityType(rendererIcon.color, entity.type);
         if (entity.type == EntityType.Tree) {
             handler = new EntityTreeHandler(this, entity as EntityTree);
         } else if (entity.type == EntityType.Fruit) {
@@ -91,7 +95,6 @@ public class EntityFruitHandler : EntityScriptHandler {
     public override void Update() {
         Vector3 newPosition = Vector3.SmoothDamp(script.transform.localPosition, new Vector3(fruit.coor.x, fruit.coor.y), ref velocity, .1f / Time.timeScale);
         newPosition.z = new Vector2(velocity.x, velocity.y).sqrMagnitude * -.01f;
-        Debug.Log(newPosition.z);
         script.transform.localPosition = newPosition;
     }
 }
@@ -102,6 +105,8 @@ public class EntityGadgetHandler : EntityScriptHandler {
     public EntityGadgetHandler(EntityScript script, EntityGadget gadget) : base(script) {
         this.gadget = gadget;
         script.tmpName.text = gadget.name;
+        script.rendererIcon.gameObject.SetActive(true);
+        script.rendererIcon.sprite = script.icons.First(i => i.name == "icon_gadget_" + gadget.name.ToLower());
     }
 }
 
@@ -111,5 +116,7 @@ public class EntityFixtureHandler : EntityScriptHandler {
     public EntityFixtureHandler(EntityScript script, EntityFixture fixture) : base(script) {
         this.fixture = fixture;
         script.tmpName.text = fixture.name;
+        script.rendererIcon.gameObject.SetActive(true);
+        script.rendererIcon.sprite = script.icons.First(i => i.name == "icon_fixture_" + fixture.name.ToLower());
     }
 }

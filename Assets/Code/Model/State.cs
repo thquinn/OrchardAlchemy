@@ -21,9 +21,10 @@ namespace Assets.Code.Model {
             Vector3Int[] fruitTypesAndWeights2 = new Vector3Int[] {
                 new Vector3Int(5, 1, 1),
             };
-            SpawnTree(new Vector2Int(-5, 0), fruitTypesAndWeights, new Vector2Int[] { Vector2Int.right });
+            SpawnTree(new Vector2Int(-5, 0), fruitTypesAndWeights, null);
             SpawnEntity(new EntityFlinger(this, new Vector2Int(-3, 0)));
             SpawnEntity(new EntityMarket(this, new Vector2Int(0, 4)));
+            SpawnEntity(new EntityMarket(this, new Vector2Int(-4, -1)));
             SpawnTree(new Vector2Int(5, 0), fruitTypesAndWeights2, new Vector2Int[] { Vector2Int.left });
             SpawnEntity(new EntityFlinger(this, new Vector2Int(3, 0)));
             SpawnEntity(new EntityFlinger(this, new Vector2Int(0, 1)));
