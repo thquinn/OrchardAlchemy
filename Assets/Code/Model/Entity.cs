@@ -10,6 +10,7 @@ namespace Assets.Code.Model {
         public State state;
         public Vector2Int coor;
         public EntityType type;
+        public EntitySubtype subtype;
         public int ticksAlive;
 
         public Entity(State board, Vector2Int coor, EntityType type) {
@@ -25,5 +26,8 @@ namespace Assets.Code.Model {
 
     public enum EntityType {
         None, Fixture, Fruit, Gadget, Tree
+    }
+    public enum EntitySubtype {
+        None, Blocker
     }
 }
