@@ -168,90 +168,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &2136387149630075103
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2136387149630075102}
-  - component: {fileID: 2136387149630075089}
-  m_Layer: 0
-  m_Name: Circle
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2136387149630075102
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2136387149630075103}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2136387151053442862}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &2136387149630075089
-SpriteRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2136387149630075103}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: d1f6d8a11c9f03f439d8040d7b8f116e, type: 3}
-  m_Color: {r: 0.30588236, g: 0.20000002, b: 0.08627451, a: 1}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
 --- !u!1 &2136387149756148172
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,10 +222,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29e9a40989be2a949a739b829f7c8e5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefabReactivityNotch: {fileID: 4200792153402711655, guid: 3f31255ca1545444cbc1e2682a72d4c3, type: 3}
   icons:
   - {fileID: 21300000, guid: a9fc010242710834fbae0087a4196eeb, type: 3}
   - {fileID: 21300000, guid: e518c24e9ee5d9e478fafc8e7b4414de, type: 3}
   - {fileID: 21300000, guid: aaf2e3656d4d1aa4f85c3b5615d0e706, type: 3}
+  - {fileID: 21300000, guid: 62bb22bddd6873d4487718f5a2ea5c98, type: 3}
   rendererTop: {fileID: 2136387150134651794}
   rendererSide: {fileID: 2136387150429036512}
   rendererShadow: {fileID: 2136387150505637248}
@@ -319,6 +237,7 @@ MonoBehaviour:
   tmpName: {fileID: 2136387150342506072}
   tmpMass: {fileID: 2136387149818282737}
   directionArrows: {fileID: 3676382538291727258}
+  reactivityAnchor: {fileID: 2136387151053442863}
   rendererArrowRight: {fileID: 754021637730221422}
   rendererArrowUp: {fileID: 1187682813738462801}
   rendererArrowLeft: {fileID: 4587540228398509155}
@@ -1102,7 +1021,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2136387151053442862
 Transform:
   m_ObjectHideFlags: 0
@@ -1114,8 +1033,7 @@ Transform:
   m_LocalPosition: {x: 0, y: -0.34, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2136387149630075102}
+  m_Children: []
   m_Father: {fileID: 2136387149756148175}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

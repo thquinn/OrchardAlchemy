@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Assets.Code.Model {
     public class State {
-        public int cents;
+        public int cents, totalCentsEarned;
         public Dictionary<Vector2Int, Entity> entities;
         List<PendingThrow> pendingThrows;
 
@@ -21,14 +21,19 @@ namespace Assets.Code.Model {
             Vector3Int[] fruitTypesAndWeights2 = new Vector3Int[] {
                 new Vector3Int(5, 1, 1),
             };
-            SpawnTree(new Vector2Int(-5, 0), fruitTypesAndWeights, null);
+            SpawnTree(new Vector2Int(-5, 0), fruitTypesAndWeights, new Vector2Int[] { Vector2Int.right });
+            /*
             SpawnEntity(new EntityFlinger(this, new Vector2Int(-3, 0)));
-            SpawnEntity(new EntityMarket(this, new Vector2Int(0, 4)));
-            SpawnEntity(new EntityMarket(this, new Vector2Int(-4, -1)));
+            SpawnEntity(new EntityFuser(this, new Vector2Int(1, 4)));
             SpawnTree(new Vector2Int(5, 0), fruitTypesAndWeights2, new Vector2Int[] { Vector2Int.left });
             SpawnEntity(new EntityFlinger(this, new Vector2Int(3, 0)));
             SpawnEntity(new EntityFlinger(this, new Vector2Int(0, 1)));
+            SpawnEntity(new EntityFlinger(this, new Vector2Int(1, 1)));
+            SpawnEntity(new EntityBlocker(this, new Vector2Int(1, 5)));
             SpawnEntity(new EntityBlocker(this, new Vector2Int(0, 5)));
+            SpawnEntity(new EntityFlinger(this, new Vector2Int(3, 4)));
+            SpawnEntity(new EntityMarket(this, new Vector2Int(10, 4)));
+            */
         }
 
         public EntityType GetTypeAtCoor(Vector2Int coor) {
@@ -59,6 +64,11 @@ namespace Assets.Code.Model {
         public void ConsumeEntity(Entity entity) {
             entity.state = null;
             entities.Remove(entity.coor);
+        }
+
+        public void GetMoney(int cents) {
+            this.cents += cents;
+            totalCentsEarned += cents;
         }
 
         public void Tick() {

@@ -11,7 +11,7 @@ namespace Assets.Code {
             if (FRUIT_MASS_TO_INFO.ContainsKey(mass)) {
                 return FRUIT_MASS_TO_INFO[mass].name;
             }
-            return "Unknown Fruit";
+            return "???";
         }
         public static Color GetFruitColorFromMass(int mass) {
             if (FRUIT_MASS_TO_INFO.ContainsKey(mass)) {

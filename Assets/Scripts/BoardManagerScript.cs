@@ -3,22 +3,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BoardManagerScript : MonoBehaviour
-{
-    public GameObject prefabEntity;
+public class BoardManagerScript : MonoBehaviour {
+    public GameObject prefabEntity, prefabGadgetRow;
 
+    public RectTransform rectTransformGadgetPanel;
+
+    Camera cam;
     public State state;
     Dictionary<Entity, EntityScript> entityScripts;
+    Entity draggedEntity;
+    EntityScript draggedEntityScript;
 
     void Start() {
+        cam = Camera.main;
         state = new State();
         entityScripts = new Dictionary<Entity, EntityScript>();
         EntityCheck();
+
+        AddGadgetRow(new EntityFlinger(null, Vector2Int.zero));
     }
 
     void Update() {
         if (Mathf.FloorToInt(Time.time - Time.deltaTime) < Mathf.FloorToInt(Time.time)) {
             Tick();
+        }
+        UpdateDraggedEntity();
+        // DEBUG
+        if (Input.GetKeyDown(KeyCode.F2)) {
+            Time.timeScale += 1;
         }
     }
     void Tick() {
@@ -45,5 +57,37 @@ public class BoardManagerScript : MonoBehaviour
                 entityScripts[entity] = entityScript;
             }
         }
+    }
+
+    void UpdateDraggedEntity() {
+        if (draggedEntity == null) {
+            return;
+        }
+        Vector3 worldMousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
+        if (!Input.GetMouseButton(0)) {
+            draggedEntity.coor = new Vector2Int(Mathf.RoundToInt(worldMousePosition.x), Mathf.RoundToInt(worldMousePosition.y));
+            state.SpawnEntity(draggedEntity);
+            EntityCheck();
+            draggedEntity = null;
+            Destroy(draggedEntityScript.gameObject);
+            draggedEntityScript = null;
+            return;
+        }
+        worldMousePosition.z = -10;
+        draggedEntityScript.transform.localPosition = worldMousePosition;
+    }
+
+    void AddGadgetRow(EntityGadget gadget) {
+        Instantiate(prefabGadgetRow, rectTransformGadgetPanel).GetComponent<GadgetRowScript>().Init(this, gadget);
+    }
+    public void DragNewGadget(EntityGadget gadget) {
+        if (gadget is EntityFlinger) {
+            gadget = new EntityFlinger(state, Vector2Int.zero);
+        } else {
+            throw new System.Exception("Unknown gadget type: " + gadget.name);
+        }
+        draggedEntity = gadget;
+        draggedEntityScript = Instantiate(prefabEntity, transform).GetComponent<EntityScript>();
+        draggedEntityScript.Init(gadget);
     }
 }

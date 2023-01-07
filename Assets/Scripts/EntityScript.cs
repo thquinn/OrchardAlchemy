@@ -9,11 +9,12 @@ using UnityEngine;
 
 public class EntityScript : MonoBehaviour
 {
+    public GameObject prefabReactivityNotch;
     public Sprite[] icons;
 
     public SpriteRenderer rendererTop, rendererSide, rendererShadow, rendererWoodGrain, rendererGradient, rendererIcon;
     public TextMeshPro tmpName, tmpMass;
-    public GameObject directionArrows;
+    public GameObject directionArrows, reactivityAnchor;
     public SpriteRenderer rendererArrowRight, rendererArrowUp, rendererArrowLeft, rendererArrowDown;
 
     EntityScriptHandler handler;
@@ -37,6 +38,12 @@ public class EntityScript : MonoBehaviour
 
     void Update() {
         handler.Update();
+    }
+    public void DestroyReactivityNotch() {
+        Destroy(reactivityAnchor.transform.GetChild(0).gameObject);
+    }
+    public void AddReactivityNotch() {
+        Instantiate(prefabReactivityNotch, reactivityAnchor.transform);
     }
 }
 
@@ -70,10 +77,6 @@ public class EntityTreeHandler : EntityScriptHandler {
             script.rendererArrowDown.gameObject.SetActive(true);
         }
     }
-
-    public override void Update() {
-
-    }
 }
 
 public class EntityFruitHandler : EntityScriptHandler {
@@ -93,9 +96,22 @@ public class EntityFruitHandler : EntityScriptHandler {
     }
 
     public override void Update() {
-        Vector3 newPosition = Vector3.SmoothDamp(script.transform.localPosition, new Vector3(fruit.coor.x, fruit.coor.y), ref velocity, .1f / Time.timeScale);
+        Vector3 newPosition = Vector3.SmoothDamp(script.transform.localPosition, new Vector3(fruit.coor.x, fruit.coor.y), ref velocity, .1f);
         newPosition.z = new Vector2(velocity.x, velocity.y).sqrMagnitude * -.01f;
         script.transform.localPosition = newPosition;
+        // Reactivity.
+        if (fruit.reactivity != script.reactivityAnchor.transform.childCount) {
+            while (fruit.reactivity < script.reactivityAnchor.transform.childCount) {
+                script.DestroyReactivityNotch();
+            }
+            while (fruit.reactivity > script.reactivityAnchor.transform.childCount) {
+                script.AddReactivityNotch();
+            }
+            float midIndex = fruit.reactivity / 2f - .5f;
+            for (int i = 0; i < fruit.reactivity; i++) {
+                script.reactivityAnchor.transform.GetChild(i).localPosition = new Vector3(-.1f * (i - midIndex), 0, 0);
+            }
+        }
     }
 }
 

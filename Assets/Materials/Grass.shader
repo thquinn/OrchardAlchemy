@@ -3,10 +3,12 @@ Shader "thquinn/Grass"
     Properties
     {
         _Color ("Color", Color) = (1,1,1,1)
+        _SparseColor ("Sparse Color", Color) = (1,1,1,1)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _SparsenessTex ("Sparseness (RGB)", 2D) = "white" {}
         _WindTex ("Wind (RGB)", 2D) = "white" {}
         _GridTex ("Grid (RGB)", 2D) = "white" {}
+        _Fade ("Fade", Range(0.0, 1.0)) = 0
     }
     SubShader
     {
@@ -36,7 +38,8 @@ Shader "thquinn/Grass"
             };
 
             sampler2D _MainTex, _SparsenessTex, _WindTex, _GridTex;
-            fixed4 _Color;
+            fixed4 _Color, _SparseColor;
+            float _Fade;
 
             v2f vert (appdata v)
             {
@@ -67,9 +70,18 @@ Shader "thquinn/Grass"
                 main = lerp(.8, 1.2, main);
                 float glint = pow(tex2D(_WindTex, windUV) * main, 10);
                 main += glint * .2;
-                float grid = tex2D(_GridTex, i.worldSpacePos);
-                grid = lerp(.8, 1, grid);
-                return main * _Color * grid;
+                float2 gridUV = i.worldSpacePos;
+                gridUV.y -= .01;
+                float grid = tex2D(_GridTex, gridUV);
+                grid = lerp(.75, 1, grid);
+                grid = lerp(grid, 1, _Fade);
+                fixed4 color = _Color;
+                float2 sparsenessUV = i.worldSpacePos * .01;
+                float sparseness = tex2D(_SparsenessTex, sparsenessUV);
+                sparseness = lerp(0, .5, sparseness);
+                color = lerp(color, _SparseColor, sparseness);
+                fixed4 ret = main * color * grid;
+                return ret;
             }
             ENDCG
         }

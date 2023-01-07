@@ -8,6 +8,8 @@ public class CameraScript : MonoBehaviour
 
     public Camera cam;
     public EventSystem eventSystem;
+    public MeshRenderer backgroundRenderer;
+    public float backgroundShaderFadeMinSize, backgroundShaderFadeMaxSize;
     public Vector3? lastDragPosition;
 
     void Update() {
@@ -31,6 +33,8 @@ public class CameraScript : MonoBehaviour
         cam.orthographicSize = newSize;
         if (newSize != currentSize) {
             transform.Translate((mouseWorldPosition - transform.localPosition) * (1 - newSize / currentSize));
+            float backgroundShaderFade = Mathf.InverseLerp(backgroundShaderFadeMinSize, backgroundShaderFadeMaxSize, newSize);
+            backgroundRenderer.material.SetFloat("_Fade", backgroundShaderFade);
         }
     }
 }

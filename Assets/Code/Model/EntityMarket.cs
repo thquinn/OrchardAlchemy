@@ -29,7 +29,7 @@ namespace Assets.Code.Model {
             if (eligibleFruit != null) {
                 var fruitToSell = eligibleFruit.Where(f => lastTurnFruit.Contains(f)).Cast<EntityFruit>();
                 foreach (EntityFruit fruit in fruitToSell) {
-                    state.cents += GetFruitPrice(fruit);
+                    state.GetMoney(GetFruitPrice(fruit));
                     state.ConsumeEntity(fruit);
                 }
             }

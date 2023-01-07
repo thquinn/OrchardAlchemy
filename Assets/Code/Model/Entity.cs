@@ -13,8 +13,8 @@ namespace Assets.Code.Model {
         public EntitySubtype subtype;
         public int ticksAlive;
 
-        public Entity(State board, Vector2Int coor, EntityType type) {
-            this.state = board;
+        public Entity(State state, Vector2Int coor, EntityType type) {
+            this.state = state;
             this.coor = coor;
             this.type = type;
         }
