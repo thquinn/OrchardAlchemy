@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace Assets.Code.Model {
     public class EntityTree : Entity {
+        static int SPAWN_RATE = 4;
+
         public Vector3Int[] fruitTypesAndWeights;
         public Vector2Int[] directions;
 
@@ -15,9 +17,8 @@ namespace Assets.Code.Model {
             this.directions = directions ?? Util.ALL_DIRECTIONS;
         }
 
-        public override void Tick() {
-            base.Tick();
-            if (ticksAlive % 10 != 1) {
+        public override void TickSpawn() {
+            if (ticksAlive % SPAWN_RATE != 1) {
                 return;
             }
             Vector3Int fruitType = new Vector3Int();

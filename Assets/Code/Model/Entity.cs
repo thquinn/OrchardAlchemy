@@ -19,15 +19,22 @@ namespace Assets.Code.Model {
             this.type = type;
         }
 
-        public virtual void Tick() {
+        public virtual void TickStart() {
             ticksAlive++;
         }
+        public virtual void TickThrow() { }
+        public virtual void TickConsume() { }
+        public virtual void TickSpawn() { }
     }
 
     public enum EntityType {
         None, Fixture, Fruit, Gadget, Tree
     }
     public enum EntitySubtype {
-        None, Blocker
+        None,
+        // Gadget subtypes.
+        Blocker,
+        // Fixture subtypes.
+        Market,
     }
 }

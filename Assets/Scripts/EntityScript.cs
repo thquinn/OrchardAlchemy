@@ -26,6 +26,8 @@ public class EntityScript : MonoBehaviour
             handler = new EntityFruitHandler(this, entity as EntityFruit);
         } else if (entity.type == EntityType.Gadget) {
             handler = new EntityGadgetHandler(this, entity as EntityGadget);
+        } else if (entity.type == EntityType.Fixture) {
+            handler = new EntityFixtureHandler(this, entity as EntityFixture);
         }
     }
 
@@ -72,6 +74,7 @@ public class EntityTreeHandler : EntityScriptHandler {
 
 public class EntityFruitHandler : EntityScriptHandler {
     EntityFruit fruit;
+    Vector3 velocity;
 
     public EntityFruitHandler(EntityScript script, EntityFruit fruit) : base(script) {
         this.fruit = fruit;
@@ -86,7 +89,10 @@ public class EntityFruitHandler : EntityScriptHandler {
     }
 
     public override void Update() {
-        script.transform.localPosition = new Vector3(fruit.coor.x, fruit.coor.y, 0);
+        Vector3 newPosition = Vector3.SmoothDamp(script.transform.localPosition, new Vector3(fruit.coor.x, fruit.coor.y), ref velocity, .1f / Time.timeScale);
+        newPosition.z = new Vector2(velocity.x, velocity.y).sqrMagnitude * -.01f;
+        Debug.Log(newPosition.z);
+        script.transform.localPosition = newPosition;
     }
 }
 
@@ -96,5 +102,14 @@ public class EntityGadgetHandler : EntityScriptHandler {
     public EntityGadgetHandler(EntityScript script, EntityGadget gadget) : base(script) {
         this.gadget = gadget;
         script.tmpName.text = gadget.name;
+    }
+}
+
+public class EntityFixtureHandler : EntityScriptHandler {
+    EntityFixture fixture;
+
+    public EntityFixtureHandler(EntityScript script, EntityFixture fixture) : base(script) {
+        this.fixture = fixture;
+        script.tmpName.text = fixture.name;
     }
 }

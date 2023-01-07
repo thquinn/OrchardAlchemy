@@ -11,8 +11,7 @@ namespace Assets.Code.Model {
 
         public EntityFlinger(State board, Vector2Int coor) : base(board, coor, "Flinger") { }
 
-        public override void Tick() {
-            base.Tick();
+        public override void TickThrow() {
             foreach (Vector2Int direction in Util.ALL_DIRECTIONS) {
                 Vector2Int sourceCoor = coor + direction;
                 if (state.GetTypeAtCoor(sourceCoor) == EntityType.Fruit) {

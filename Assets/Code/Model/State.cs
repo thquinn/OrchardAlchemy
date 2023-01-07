@@ -7,17 +7,27 @@ using UnityEngine;
 
 namespace Assets.Code.Model {
     public class State {
+        public int cents;
         public Dictionary<Vector2Int, Entity> entities;
         List<PendingThrow> pendingThrows;
-        Dictionary<Vector2Int, Entity> pendingSpawns;
 
         public State() {
             entities = new Dictionary<Vector2Int, Entity>();
-            pendingSpawns = new Dictionary<Vector2Int, Entity>();
             pendingThrows = new List<PendingThrow>();
-            SpawnTree();
-            EntityFlinger flinger = new EntityFlinger(this, new Vector2Int(2, 0));
-            SpawnEntity(flinger);
+
+            Vector3Int[] fruitTypesAndWeights = new Vector3Int[] {
+                new Vector3Int(4, 1, 1),
+            };
+            Vector3Int[] fruitTypesAndWeights2 = new Vector3Int[] {
+                new Vector3Int(5, 1, 1),
+            };
+            SpawnTree(new Vector2Int(-5, 0), fruitTypesAndWeights, new Vector2Int[] { Vector2Int.right });
+            SpawnEntity(new EntityFlinger(this, new Vector2Int(-3, 0)));
+            SpawnEntity(new EntityMarket(this, new Vector2Int(0, 4)));
+            SpawnTree(new Vector2Int(5, 0), fruitTypesAndWeights2, new Vector2Int[] { Vector2Int.left });
+            SpawnEntity(new EntityFlinger(this, new Vector2Int(3, 0)));
+            SpawnEntity(new EntityFlinger(this, new Vector2Int(0, 1)));
+            SpawnEntity(new EntityBlocker(this, new Vector2Int(0, 5)));
         }
 
         public EntityType GetTypeAtCoor(Vector2Int coor) {
@@ -32,15 +42,12 @@ namespace Assets.Code.Model {
         }
 
         public void SpawnEntity(Entity entity) {
-            if (!entities.ContainsKey(entity.coor) && !pendingSpawns.ContainsKey(entity.coor)) {
-                pendingSpawns[entity.coor] = entity;
+            if (!entities.ContainsKey(entity.coor)) {
+                entities[entity.coor] = entity;
             }
         }
-        public void SpawnTree() {
-            Vector3Int[] fruitTypesAndWeights = new Vector3Int[] {
-                new Vector3Int(4, 1, 1),
-            };
-            EntityTree tree = new EntityTree(this, new Vector2Int(0, 0), fruitTypesAndWeights, new Vector2Int[] { Vector2Int.right });
+        public void SpawnTree(Vector2Int coor, Vector3Int[] fruitTypesAndWeights, Vector2Int[] directions) {
+            EntityTree tree = new EntityTree(this, coor, fruitTypesAndWeights, directions);
             SpawnEntity(tree);
         }
         public void SpawnFruit(Vector2Int coor, int mass, int reactivity) {
@@ -48,15 +55,26 @@ namespace Assets.Code.Model {
             SpawnEntity(fruit);
         }
 
+        public void ConsumeEntity(Entity entity) {
+            entity.state = null;
+            entities.Remove(entity.coor);
+        }
+
         public void Tick() {
-            foreach (Entity entity in entities.Values) {
-                entity.Tick();
+            List<Entity> entitiesThisTurn = new List<Entity>(entities.Values);
+            foreach (Entity entity in entitiesThisTurn) {
+                entity.TickStart();
             }
-            foreach (var kvp in pendingSpawns) {
-                entities[kvp.Key] = kvp.Value;
+            foreach (Entity entity in entitiesThisTurn) {
+                entity.TickThrow();
             }
-            pendingSpawns.Clear();
             PerformPendingThrows();
+            foreach (Entity entity in entitiesThisTurn) {
+                entity.TickConsume();
+            }
+            foreach (Entity entity in entitiesThisTurn) {
+                entity.TickSpawn();
+            }
         }
         void PerformPendingThrows() {
             // Sort throws, giving priority to right -> up -> left -> down.

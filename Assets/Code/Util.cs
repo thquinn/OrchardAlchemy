@@ -12,7 +12,7 @@ namespace Assets.Code {
             if (FRUIT_MASS_TO_INFO.ContainsKey(mass)) {
                 return FRUIT_MASS_TO_INFO[mass].name;
             }
-            return "Fruit " + mass;
+            return "Unknown Fruit";
         }
         public static Color GetFruitColorFromMass(int mass) {
             if (FRUIT_MASS_TO_INFO.ContainsKey(mass)) {
@@ -35,15 +35,22 @@ namespace Assets.Code {
                 h = 48f / 360;
             } else if (type == EntityType.Fruit) {
                 h = 90f / 360;
+            } else if (type == EntityType.Fixture) {
+                h = 190f / 360;
             } else {
                 s = 0;
             }
             return Color.HSVToRGB(h, s, v);
         }
+        public static Color HexToColor(string hex) {
+            Color color;
+            return ColorUtility.TryParseHtmlString(hex, out color) ? color : Color.clear;
+        }
 
         public static Vector2Int[] ALL_DIRECTIONS = new Vector2Int[] { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
         static Dictionary<int, FruitInfo> FRUIT_MASS_TO_INFO = new Dictionary<int, FruitInfo>() {
             { 4, new FruitInfo("Apple", Color.red) },
+            { 5, new FruitInfo("Pear", HexToColor("#D1E231")) },
         };
     }
 

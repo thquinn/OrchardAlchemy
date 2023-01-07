@@ -7,7 +7,7 @@ public class BoardManagerScript : MonoBehaviour
 {
     public GameObject prefabEntity;
 
-    State state;
+    public State state;
     Dictionary<Entity, EntityScript> entityScripts;
 
     void Start() {
@@ -34,6 +34,7 @@ public class BoardManagerScript : MonoBehaviour
             }
         }
         foreach (Entity entity in toRemove) {
+            Destroy(entityScripts[entity].gameObject);
             entityScripts.Remove(entity);
         }
         // Spawning new entities.
