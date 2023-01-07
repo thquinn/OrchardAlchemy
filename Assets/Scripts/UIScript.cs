@@ -12,6 +12,7 @@ public class UIScript : MonoBehaviour
         { ProgressionPhase.TutorialFlinger, "Click the button in the lower right and drag a Flinger onto the highlighted spot." },
         { ProgressionPhase.TutorialBlocker, "Place a Blocker in the highlighted spot, then use another Flinger to reach the new Market." },
         { ProgressionPhase.SecondTree, "Sell apples and pears." },
+        { ProgressionPhase.SecondTreeMoney, "Sell fruit until you can afford a Fuser." },
     };
 
     public GameObject prefabFruitCost;

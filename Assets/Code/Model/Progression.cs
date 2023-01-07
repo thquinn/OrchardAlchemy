@@ -12,12 +12,15 @@ namespace Assets.Code.Model {
 
         // GADGET COSTS
         static Dictionary<EntitySubtype, GadgetCost[]> GADGET_COSTS = new Dictionary<EntitySubtype, GadgetCost[]>() {
-            { EntitySubtype.Flinger, new GadgetCost[] {
-                new GadgetCost(10, null),
-            } },
             { EntitySubtype.Blocker, new GadgetCost[] {
-                new GadgetCost(5, null),
-            } }
+                new GadgetCost(5, 5 * 100, null),
+            } },
+            { EntitySubtype.Flinger, new GadgetCost[] {
+                new GadgetCost(5, 10 * 100, null),
+            } },
+            { EntitySubtype.Fuser, new GadgetCost[] {
+                new GadgetCost(1, 50 * 100, null),
+            } },
         };
 
         // TREES
@@ -58,17 +61,33 @@ namespace Assets.Code.Model {
                 phase = ProgressionPhase.TutorialFlinger;
                 state.StoreGadgetType(EntitySubtype.Flinger);
                 highlightCoors = new Vector2Int[] { COOR_FIRST_TREE + Vector2Int.right * 2 };
-            } else if (phase == ProgressionPhase.TutorialFlinger && state.storedGadgets[EntitySubtype.Flinger] == 0 && state.totalCentsEarned >= 600) {
+            }
+            if (phase == ProgressionPhase.TutorialFlinger && state.storedGadgets[EntitySubtype.Flinger] == 0 && state.totalCentsEarned >= 600) {
                 phase = ProgressionPhase.TutorialBlocker;
                 state.RemoveEntityAtCoor(COOR_TUTORIAL_FLINGER_MARKET);
                 state.SpawnEntity(new EntityMarket(state, COOR_TUTORIAL_BLOCKER_MARKET));
                 state.StoreGadgetType(EntitySubtype.Blocker);
+                state.StoreGadgetType(EntitySubtype.Flinger);
                 highlightCoors = new Vector2Int[] { COOR_TUTORIAL_BLOCKER_POSITION };
-            } else if (phase == ProgressionPhase.TutorialBlocker && state.totalCentsEarned >= 1000) {
+            }
+            if (phase == ProgressionPhase.TutorialBlocker && state.totalCentsEarned >= 1000) {
                 state.SpawnTree(COOR_SECOND_TREE, TREE_PEAR, new Vector2Int[] { Vector2Int.left });
                 phase = ProgressionPhase.SecondTree;
+                UnlockPurchase(EntitySubtype.Flinger);
+                UnlockPurchase(EntitySubtype.Blocker);
                 highlightCoors = null;
             }
+            if (phase == ProgressionPhase.SecondTree && state.fruitProcessedCounts.ContainsKey(4) && state.fruitProcessedCounts.ContainsKey(5)) {
+                phase = ProgressionPhase.SecondTreeMoney;
+                UnlockPurchase(EntitySubtype.Fuser);
+            }
+            if (phase == ProgressionPhase.SecondTreeMoney && state.cents >= GADGET_COSTS[EntitySubtype.Fuser][0].cents) {
+                phase = ProgressionPhase.TutorialFuser;
+                state.RemoveEntityAtCoor(COOR_TUTORIAL_BLOCKER_MARKET);
+            }
+        }
+        void UnlockPurchase(EntitySubtype gadgetType) {
+            gadgetCosts[gadgetType] = GADGET_COSTS[gadgetType][0];
         }
     }
 
@@ -77,13 +96,17 @@ namespace Assets.Code.Model {
         TutorialFlinger = 1,
         TutorialBlocker = 2,
         SecondTree = 3,
+        SecondTreeMoney = 4,
+        TutorialFuser = 5,
     }
 
     public class GadgetCost {
-        public int cents;
+        public int stockAmount; // How many of this gadget can be bought at this price before it goes up.
+        public ulong cents;
         public Vector2Int[] massesAndAmounts;
 
-        public GadgetCost(int cents, params Vector2Int[] massesAndAmounts) {
+        public GadgetCost(int stockAmount, ulong cents, params Vector2Int[] massesAndAmounts) {
+            this.stockAmount = stockAmount;
             this.cents = cents;
             this.massesAndAmounts = massesAndAmounts ?? new Vector2Int[0];
         }

@@ -11,7 +11,7 @@ namespace Assets.Code.Model {
         public ulong cents, totalCentsEarned;
         public Dictionary<int, int> fruitProcessedCounts;
         public Dictionary<int, ulong> storedFruit;
-        public Dictionary<EntitySubtype, ulong> storedGadgets;
+        public Dictionary<EntitySubtype, int> storedGadgets;
         public Progression progression;
         List<PendingThrow> pendingThrows;
 
@@ -19,7 +19,7 @@ namespace Assets.Code.Model {
             entities = new Dictionary<Vector2Int, Entity>();
             fruitProcessedCounts = new Dictionary<int, int>();
             storedFruit = new Dictionary<int, ulong>();
-            storedGadgets = new Dictionary<EntitySubtype, ulong>();
+            storedGadgets = new Dictionary<EntitySubtype, int>();
             progression = new Progression(this);
             pendingThrows = new List<PendingThrow>();
             /*
@@ -101,6 +101,9 @@ namespace Assets.Code.Model {
                 storedGadgets[subtype]++;
             }
         }
+        public int GetStoredGadgetCount(EntitySubtype subtype) {
+            return storedGadgets.ContainsKey(subtype) ? storedGadgets[subtype] : 0;
+        }
         public void UnstoreEntity(Entity entity) {
             if (entity.type == EntityType.Fruit) {
                 int mass = (entity as EntityFruit).mass;
@@ -118,6 +121,26 @@ namespace Assets.Code.Model {
             } else {
                 fruitProcessedCounts[fruit.mass]++;
             }
+        }
+
+        public bool CheckAndPayCost(GadgetCost cost) {
+            if (cost.cents > cents) {
+                return false;
+            }
+            foreach (Vector2Int massAndAmount in cost.massesAndAmounts) {
+                if (!storedFruit.ContainsKey(massAndAmount.x)) {
+                    return false;
+                }
+                if (storedFruit[massAndAmount.x] < (ulong) massAndAmount.y) {
+                    return false;
+                }
+            }
+            // Pay!
+            cents -= cost.cents;
+            foreach (Vector2Int massAndAmount in cost.massesAndAmounts) {
+                storedFruit[massAndAmount.x] -= (ulong) massAndAmount.y;
+            }
+            return true;
         }
 
         public void Tick() {

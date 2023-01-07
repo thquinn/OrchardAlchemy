@@ -94,8 +94,13 @@ public class BoardManagerScript : MonoBehaviour {
 
     public void DragNewGadget(EntityGadget gadget) {
         // Pay or remove from storage.
-        if (state.storedGadgets.ContainsKey(gadget.subtype)) {
+        if (state.GetStoredGadgetCount(gadget.subtype) > 0) {
             state.UnstoreEntity(gadget);
+        } else {
+            GadgetCost cost = state.progression.gadgetCosts.ContainsKey(gadget.subtype) ? state.progression.gadgetCosts[gadget.subtype] : null;
+            if (cost == null || !state.CheckAndPayCost(cost)) {
+                return;
+            }
         }
         // Create and drag.
         gadget = Util.GetGadgetInstanceFromSubtype(gadget.subtype);
