@@ -94,11 +94,11 @@ namespace Assets.Code.Model {
         }
 
         public void GetMoney(ulong gained, bool clamp = true) {
-            if (cents + gained > progression.maxCents) {
+            totalCentsEarned += gained;
+            if (clamp && cents + gained > progression.maxCents) {
                 gained = progression.maxCents - cents;
             }
             cents += gained;
-            totalCentsEarned += gained;
         }
         public void StoreEntity(Entity entity) {
             if (entity.type == EntityType.Fruit) {

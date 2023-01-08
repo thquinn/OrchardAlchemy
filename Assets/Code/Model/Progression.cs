@@ -29,16 +29,28 @@ namespace Assets.Code.Model {
         };
 
         // TREES
+        static Vector3Int[] TREE_MINT = new Vector3Int[] {
+            new Vector3Int(1, 2, 1),
+        };
         static Vector3Int[] TREE_APPLE = new Vector3Int[] {
             new Vector3Int(4, 1, 1),
         };
         static Vector3Int[] TREE_PEAR = new Vector3Int[] {
             new Vector3Int(5, 1, 1),
         };
+        static Vector3Int[] TREE_MINT_APPLE = new Vector3Int[] {
+            new Vector3Int(1, 1, 1),
+            new Vector3Int(4, 1, 1),
+        };
+        static Vector3Int[] TREE_MINT_PEAR = new Vector3Int[] {
+            new Vector3Int(1, 1, 1),
+            new Vector3Int(5, 1, 1),
+        };
         static Vector3Int[] TREE_APPLE_PEAR = new Vector3Int[] {
             new Vector3Int(4, 1, 1),
             new Vector3Int(5, 1, 1),
         };
+        static Vector3Int[][] ALL_TREES = new Vector3Int[][] { TREE_MINT, TREE_APPLE, TREE_PEAR, TREE_MINT_APPLE, TREE_MINT_PEAR, TREE_APPLE_PEAR };
 
         // COORDINATES
         static Vector2Int COOR_FIRST_TREE = new Vector2Int(-5, 0);
@@ -132,6 +144,9 @@ namespace Assets.Code.Model {
                 phase = ProgressionPhase.TutorialOver;
                 state.SpawnTree(COOR_FOURTH_TREE, TREE_APPLE_PEAR, null);
             }
+            if (phase == ProgressionPhase.TutorialOver) {
+                EndlessSpawning();
+            }
         }
         public void UnlockPurchase(EntitySubtype gadgetType) {
             gadgetCosts[gadgetType] = GADGET_COSTS[gadgetType][0];
@@ -162,6 +177,41 @@ namespace Assets.Code.Model {
                 fruitsResearched.Add(research.mass);
                 Util.InvokeResearchActionByMass(research.mass, state);
                 research = null;
+            }
+        }
+
+        static ulong EPOCH_CENTS = 100 * 100;
+        ulong lastTotalCentsEarned;
+        int totalEpochs;
+        void EndlessSpawning() {
+            if (lastTotalCentsEarned == 0) {
+                lastTotalCentsEarned = state.totalCentsEarned;
+                return;
+            }
+            ulong lastEpoch = lastTotalCentsEarned / EPOCH_CENTS;
+            lastTotalCentsEarned = state.totalCentsEarned;
+            ulong thisEpoch = lastTotalCentsEarned / EPOCH_CENTS;
+            while (lastEpoch < thisEpoch) {
+                thisEpoch++;
+                SpawnEpoch();
+            }
+        }
+        public void SpawnEpoch() {
+            totalEpochs++;
+            float radius = 8 + Mathf.Sqrt(totalEpochs) * 5;
+            float theta = UnityEngine.Random.value * Mathf.PI * 2;
+            Vector2Int coor = new Vector2Int(
+                Mathf.RoundToInt(radius * Mathf.Cos(theta)),
+                Mathf.RoundToInt(radius * Mathf.Sin(theta))
+            );
+            if (totalEpochs % 7 == 1) {
+                state.SpawnEntity(new EntityMarket(state, coor));
+            } else {
+                Vector3Int[] tree = ALL_TREES[UnityEngine.Random.Range(0, ALL_TREES.Length)];
+                Vector2Int[] directions = (Vector2Int[])Util.ALL_DIRECTIONS.Clone();
+                directions.Shuffle();
+                directions = directions.Take(UnityEngine.Random.Range(1, 5)).ToArray();
+                state.SpawnTree(coor, tree, directions);
             }
         }
     }

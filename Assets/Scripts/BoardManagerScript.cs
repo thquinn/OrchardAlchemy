@@ -49,6 +49,10 @@ public class BoardManagerScript : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.F5)) {
             state.StoreGadgetType(EntitySubtype.Storage);
         }
+        if (Input.GetKeyDown(KeyCode.F6)) {
+            state.progression.SpawnEpoch();
+            EntityCheck();
+        }
     }
     void Tick() {
         state.Tick();
