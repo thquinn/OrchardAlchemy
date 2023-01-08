@@ -35,6 +35,6 @@ namespace Assets.Code.Model {
         // Gadget subtypes.
         Blocker, Flinger, Fuser, Lab, Storage,
         // Fixture subtypes.
-        Market,
+        Market, Pedestal
     }
 }

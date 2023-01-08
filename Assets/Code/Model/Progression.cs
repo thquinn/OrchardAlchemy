@@ -63,6 +63,7 @@ namespace Assets.Code.Model {
         public HashSet<int> fruitsResearched;
         public HashSet<ResearchFlags> researchFlags;
         public int timeScaleMinIndex, timeScaleMaxIndex;
+        public bool researchStartBonus;
 
         public Progression(State state) {
             this.state = state;
@@ -137,6 +138,9 @@ namespace Assets.Code.Model {
         }
 
         public bool CanResearch(EntityFruit fruit) {
+            if (research != null && researchFlags.Contains(ResearchFlags.ApproximateResearch) && Mathf.Abs(research.mass - fruit.mass) <= 1) {
+                return true;
+            }
             if (fruitsResearched.Contains(fruit.mass)) {
                 return false;
             }
@@ -148,8 +152,10 @@ namespace Assets.Code.Model {
         public void IncrementResearch(EntityFruit fruit) {
             if (research == null) {
                 research = new Research(fruit.mass, Util.GetFruitResearchGoalFromMass(fruit.mass));
-            } else {
-                Debug.Assert(fruit.mass == research.mass);
+                if (researchStartBonus) {
+                    research.progress = Mathf.CeilToInt(research.goal / 2f);
+                    researchStartBonus = false;
+                }
             }
             research.progress++;
             if (research.progress >= research.goal) {
@@ -195,6 +201,9 @@ namespace Assets.Code.Model {
         }
     }
     public enum ResearchFlags {
+        ApproximateResearch,
         ConditionalFlingers,
+        PrimeBonus,
+        SuperLemon,
     }
 }

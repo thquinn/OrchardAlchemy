@@ -33,7 +33,7 @@ namespace Assets.Code.Model {
             int fruitTypeSelector = Random.Range(0, fruitTypesAndWeights.Sum(ftw => ftw.z));
             foreach (Vector3Int fruitTypeAndWeight in fruitTypesAndWeights) {
                 fruitTypeSelector -= fruitTypeAndWeight.z;
-                if (fruitTypeSelector <= 0) {
+                if (fruitTypeSelector < 0) {
                     fruitType = fruitTypeAndWeight;
                     break;
                 }

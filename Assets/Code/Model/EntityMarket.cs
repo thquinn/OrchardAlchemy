@@ -10,6 +10,7 @@ namespace Assets.Code.Model {
         List<Entity> presentAtStart;
 
         public EntityMarket(State board, Vector2Int coor) : base(board, coor, "Market") {
+            subtype = EntitySubtype.Market;
             presentAtStart = new List<Entity>();
         }
 
@@ -38,7 +39,11 @@ namespace Assets.Code.Model {
         }
 
         int GetFruitPrice(EntityFruit fruit) {
-            return Mathf.FloorToInt(Mathf.Pow(fruit.mass / 4f, 1.1f) * 100);
+            float basePrice = Mathf.Pow(fruit.mass / 4f, 1.1f) * 100;
+            if (state.progression.researchFlags.Contains(ResearchFlags.PrimeBonus) && Util.IsPrimeMemoized(fruit.mass)) {
+                basePrice *= 1.5f;
+            }
+            return Mathf.FloorToInt(basePrice);
         }
     }
 }

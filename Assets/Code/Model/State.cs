@@ -14,6 +14,7 @@ namespace Assets.Code.Model {
         public Dictionary<EntitySubtype, int> storedGadgets;
         public Progression progression;
         List<PendingThrow> pendingThrows;
+        float flingVolume;
 
         public State() {
             entities = new Dictionary<Vector2Int, Entity>();
@@ -45,8 +46,22 @@ namespace Assets.Code.Model {
             SpawnEntity(tree);
         }
         public void SpawnFruit(Vector2Int coor, int mass, int reactivity) {
+            if (mass == 6 && progression.researchFlags.Contains(ResearchFlags.SuperLemon)) {
+                reactivity++;
+            }
             EntityFruit fruit = new EntityFruit(this, coor, mass, reactivity);
             SpawnEntity(fruit);
+        }
+        public void SpawnHalfVictory() {
+            var pedestalKVP = entities.FirstOrDefault(kvp => kvp.Value.subtype == EntitySubtype.Pedestal);
+            if (pedestalKVP.Value == null) {
+                SpawnEntity(new EntityPedestal(this, Vector2Int.zero));
+            } else {
+                RemoveEntityAtCoor(pedestalKVP.Key);
+                SpawnEntity(new EntityVictoryStatue(this, pedestalKVP.Key));
+                progression.cameraTakeover = true;
+                progression.cameraTargetPosition = new Vector3(pedestalKVP.Key.x, pedestalKVP.Key.y, 0);
+            }
         }
         static Vector2Int[] SPAWN_SEARCH_DIAGONALS = new Vector2Int[] { new Vector2Int(-1, 1), new Vector2Int(-1, -1), new Vector2Int(1, -1), new Vector2Int(1, 1) };
         Vector2Int GetNearestOpenCoor(Vector2Int coor) {
@@ -180,7 +195,9 @@ namespace Assets.Code.Model {
             foreach (Entity entity in entitiesThisTurn) {
                 entity.TickThrow();
             }
+            flingVolume = 0;
             PerformPendingThrows();
+            SFXScript.instance.SFXFling(flingVolume * Mathf.Lerp(.8f, 1, UnityEngine.Random.value));
             foreach (Entity entity in entitiesThisTurn) {
                 entity.TickSpawn();
             }
@@ -260,6 +277,7 @@ namespace Assets.Code.Model {
                     destination -= pendingThrow.direction;
                 }
                 if (destination != entity.coor) {
+                    flingVolume += (1 - flingVolume) * Util.GetVolume(entity.coor);
                     entities.Remove(entity.coor);
                     entities[destination] = entity;
                     entity.coor = destination;

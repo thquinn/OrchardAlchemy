@@ -21,7 +21,8 @@ public class GadgetDrawerScript : MonoBehaviour
     }
 
     void Update() {
-        if (open && EventSystem.current.currentSelectedGameObject != rectTransformDrawer.gameObject) {
+        bool pointerOnUI = EventSystem.current.IsPointerOverGameObject();
+        if (open && Input.GetMouseButtonDown(0) && !pointerOnUI) {
             Toggle();
         }
         rectTransformDrawer.pivot = Vector2.SmoothDamp(rectTransformDrawer.pivot, open ? new Vector2(1, 0) : new Vector2(0, 0), ref vDrawer, .2f, float.MaxValue, Time.unscaledDeltaTime);

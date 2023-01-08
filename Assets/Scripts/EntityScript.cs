@@ -125,7 +125,7 @@ public class EntityGadgetHandler : EntityScriptHandler {
         this.gadget = gadget;
         script.tmpName.text = gadget.name;
         script.rendererIcon.gameObject.SetActive(true);
-        script.rendererIcon.sprite = script.icons.First(i => i.name == "icon_gadget_" + gadget.name.ToLower());
+        script.rendererIcon.sprite = script.icons.First(i => i.name == "icon_gadget_" + gadget.name.Replace(' ', '_').ToLower());
     }
     public override void Update() {
         if (gadget.subtype == EntitySubtype.Flinger) {
@@ -142,6 +142,6 @@ public class EntityFixtureHandler : EntityScriptHandler {
         this.fixture = fixture;
         script.tmpName.text = fixture.name;
         script.rendererIcon.gameObject.SetActive(true);
-        script.rendererIcon.sprite = script.icons.First(i => i.name == "icon_fixture_" + fixture.name.ToLower());
+        script.rendererIcon.sprite = script.icons.First(i => i.name == "icon_fixture_" + fixture.name.Replace(' ', '_').ToLower());
     }
 }

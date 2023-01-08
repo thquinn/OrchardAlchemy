@@ -38,7 +38,16 @@ public class BoardManagerScript : MonoBehaviour {
             Time.timeScale += 1;
         }
         if (Input.GetKeyDown(KeyCode.F3)) {
+            state.progression.researchFlags.Add(ResearchFlags.ApproximateResearch);
             state.progression.researchFlags.Add(ResearchFlags.ConditionalFlingers);
+            state.progression.researchFlags.Add(ResearchFlags.PrimeBonus);
+            state.progression.researchFlags.Add(ResearchFlags.SuperLemon);
+        }
+        if (Input.GetKeyDown(KeyCode.F4)) {
+            state.SpawnHalfVictory();
+        }
+        if (Input.GetKeyDown(KeyCode.F5)) {
+            state.StoreGadgetType(EntitySubtype.Storage);
         }
     }
     void Tick() {
@@ -76,6 +85,8 @@ public class BoardManagerScript : MonoBehaviour {
                 state.RemoveEntity(draggedEntity);
                 draggedEntityScript = entityScripts[draggedEntity];
                 entityScripts.Remove(draggedEntity);
+                float sfxVolume = Util.GetVolume(coor);
+                SFXScript.instance.SFXLift(sfxVolume);
             } else {
                 return;
             }
@@ -88,6 +99,8 @@ public class BoardManagerScript : MonoBehaviour {
                 state.StoreEntity(draggedEntity);
             } else {
                 state.SpawnEntity(draggedEntity);
+                float sfxVolume = Util.GetVolume(coor);
+                SFXScript.instance.SFXPlace(sfxVolume);
             }
             EntityCheck();
             draggedEntity = null;

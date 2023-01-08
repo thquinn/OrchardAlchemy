@@ -16,7 +16,7 @@ public class ModalScript : MonoBehaviour
         } },
         { ProgressionPhase.FuserMoney, new ModalInfo(){
             imageNames = new string[]{ "tutorial_reactivity_1", "tutorial_reactivity_2" },
-            explanation = "The pips under a fruit's number show its <color=red>reactivity.</color> When you fuse fruits, both need to have reactivity, and the result will have one less."
+            explanation = "The pips under a fruit's number show its <color=red>reactivity:</color> the number of times it can be fused. Both fruits need it!"
         } },
     };
 

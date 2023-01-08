@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class UIScript : MonoBehaviour
 {
     static Dictionary<ProgressionPhase, string> TUTORIAL_STRINGS = new Dictionary<ProgressionPhase, string>() {
-        { ProgressionPhase.Start, "Drag apples next to the Market to sell them." },
+        { ProgressionPhase.Start, "Right-click-drag to pan, scroll wheel to zoom.\nDrag apples next to the Market to sell them." },
         { ProgressionPhase.TutorialFlinger, "Click the button in the lower right and drag a Flinger onto the highlighted spot." },
         { ProgressionPhase.TutorialBlocker, "Place a Blocker in the highlighted spot, then use another Flinger to reach the new Market." },
         { ProgressionPhase.SecondTree, "Sell apples and pears." },
@@ -43,7 +43,7 @@ public class UIScript : MonoBehaviour
         canvasGroupMoney.alpha = Mathf.SmoothDamp(canvasGroupMoney.alpha, showMoney ? 1 : 0, ref vAlphaMoney, .2f, float.MaxValue, Time.unscaledDeltaTime);
         bool showResearch = state.progression.research != null;
         canvasGroupResearch.alpha = Mathf.SmoothDamp(canvasGroupResearch.alpha, showResearch ? 1 : 0, ref vAlphaResearch, .2f, float.MaxValue, Time.unscaledDeltaTime);
-        bool showFruit = state.storedFruit.Count > 0 && state.progression.gadgetCosts.ContainsKey(EntitySubtype.Storage);
+        bool showFruit = state.storedFruit.Count > 0 && (state.storedGadgets.ContainsKey(EntitySubtype.Storage) || state.progression.gadgetCosts.ContainsKey(EntitySubtype.Storage));
         canvasGroupFruit.alpha = Mathf.SmoothDamp(canvasGroupFruit.alpha, showFruit ? 1 : 0, ref vAlphaFruit, .2f, float.MaxValue, Time.unscaledDeltaTime);
         bool showGadgetDrawerButton = state.progression.phase >= ProgressionPhase.TutorialFlinger;
         canvasGroupGadgetDrawerButton.alpha = Mathf.SmoothDamp(canvasGroupGadgetDrawerButton.alpha, showGadgetDrawerButton ? 1 : 0, ref vAlphaGadgetDrawerButton, .2f, float.MaxValue, Time.unscaledDeltaTime);
