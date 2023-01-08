@@ -14,11 +14,19 @@ namespace Assets.Code {
                 return new EntityFlinger(null, Vector2Int.zero);
             } else if (subtype == EntitySubtype.Fuser) {
                 return new EntityFuser(null, Vector2Int.zero);
+            } else if (subtype == EntitySubtype.Lab) {
+                return new EntityLab(null, Vector2Int.zero);
             } else {
                 throw new System.Exception("Unknown gadget subtype: " + subtype);
             }
         }
 
+        public static int GetFruitResearchGoalFromMass(int mass) {
+            if (FRUIT_MASS_TO_INFO.ContainsKey(mass)) {
+                return FRUIT_MASS_TO_INFO[mass].researchGoal;
+            }
+            return -1;
+        }
         public static string GetFruitNameFromMass(int mass) {
             if (FRUIT_MASS_TO_INFO.ContainsKey(mass)) {
                 return FRUIT_MASS_TO_INFO[mass].name;
@@ -58,10 +66,21 @@ namespace Assets.Code {
             return ColorUtility.TryParseHtmlString(hex, out color) ? color : Color.clear;
         }
 
+        public static int GetRoundedProgressPercent(float percent) {
+            int output = Mathf.CeilToInt(percent * 100);
+            if (output == 100 && percent < 1) {
+                output--;
+            }
+            return output;
+        }
+
         public static Vector2Int[] ALL_DIRECTIONS = new Vector2Int[] { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
         static Dictionary<int, FruitInfo> FRUIT_MASS_TO_INFO = new Dictionary<int, FruitInfo>() {
-            { 4, new FruitInfo("Apple", Color.red) },
-            { 5, new FruitInfo("Pear", HexToColor("#D1E231")) },
+            { 4, new FruitInfo("Apple", Color.red, 25) }, // wallet+
+            { 5, new FruitInfo("Pear", HexToColor("#D1E231"), 10) }, // money
+            { 8, new FruitInfo("Crabapple", HexToColor("#B00000"), 20) }, // storage
+            { 9, new FruitInfo("Quince", HexToColor("#FFEF00"), 20) }, // conditional flingers
+            { 10, new FruitInfo("Loquat", HexToColor("#EC983C"), 40) }, // timescale max+
         };
     }
 
@@ -81,10 +100,12 @@ namespace Assets.Code {
     public struct FruitInfo {
         public string name;
         public Color color;
+        public int researchGoal;
 
-        public FruitInfo(string name, Color color) {
+        public FruitInfo(string name, Color color, int researchGoal) {
             this.name = name;
             this.color = color;
+            this.researchGoal = researchGoal;
         }
     }
 }

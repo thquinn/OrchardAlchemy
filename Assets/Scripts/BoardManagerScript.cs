@@ -31,6 +31,9 @@ public class BoardManagerScript : MonoBehaviour {
         }
         UpdateDraggedEntity();
         // DEBUG
+        if (Input.GetKeyDown(KeyCode.F1)) {
+            state.GetMoney(10000000);
+        }
         if (Input.GetKeyDown(KeyCode.F2)) {
             Time.timeScale += 1;
         }

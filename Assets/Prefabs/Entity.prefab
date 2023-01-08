@@ -228,6 +228,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e518c24e9ee5d9e478fafc8e7b4414de, type: 3}
   - {fileID: 21300000, guid: aaf2e3656d4d1aa4f85c3b5615d0e706, type: 3}
   - {fileID: 21300000, guid: 62bb22bddd6873d4487718f5a2ea5c98, type: 3}
+  - {fileID: 21300000, guid: 4971a17c4c041b6488c8e2e9ecea728c, type: 3}
+  - {fileID: 21300000, guid: ec65149c57b649543a88584616ccf1d3, type: 3}
   rendererTop: {fileID: 2136387150134651794}
   rendererSide: {fileID: 2136387150429036512}
   rendererShadow: {fileID: 2136387150505637248}

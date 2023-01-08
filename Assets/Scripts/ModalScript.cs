@@ -13,6 +13,10 @@ public class ModalScript : MonoBehaviour
             imageNames = new string[]{ "tutorial_fuser_1", "tutorial_fuser_2" },
             explanation = "Fusers combine fruit! If there are two fruit next to it, the combined fruit will be placed counterclockwise from them."
         } },
+        { ProgressionPhase.FuserMoney, new ModalInfo(){
+            imageNames = new string[]{ "tutorial_reactivity_1", "tutorial_reactivity_2" },
+            explanation = "The pips under a fruit's number are its reactivity. When you fuse fruits, both need to have reactivity, and the result will have one less."
+        } },
     };
 
     public GameObject prefabModalImage;

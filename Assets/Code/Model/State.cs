@@ -22,19 +22,6 @@ namespace Assets.Code.Model {
             storedGadgets = new Dictionary<EntitySubtype, int>();
             progression = new Progression(this);
             pendingThrows = new List<PendingThrow>();
-            /*
-            SpawnTree(new Vector2Int(-5, 0), fruitTypesAndWeights, new Vector2Int[] { Vector2Int.right });
-            SpawnEntity(new EntityMarket(this, new Vector2Int(10, 4)));
-            SpawnEntity(new EntityFlinger(this, new Vector2Int(-3, 0)));
-            SpawnEntity(new EntityFuser(this, new Vector2Int(1, 4)));
-            SpawnTree(new Vector2Int(5, 0), fruitTypesAndWeights2, new Vector2Int[] { Vector2Int.left });
-            SpawnEntity(new EntityFlinger(this, new Vector2Int(3, 0)));
-            SpawnEntity(new EntityFlinger(this, new Vector2Int(0, 1)));
-            SpawnEntity(new EntityFlinger(this, new Vector2Int(1, 1)));
-            SpawnEntity(new EntityBlocker(this, new Vector2Int(1, 5)));
-            SpawnEntity(new EntityBlocker(this, new Vector2Int(0, 5)));
-            SpawnEntity(new EntityFlinger(this, new Vector2Int(3, 4)));
-            */
         }
 
         public EntityType GetTypeAtCoor(Vector2Int coor) {

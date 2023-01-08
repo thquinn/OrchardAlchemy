@@ -22,6 +22,9 @@ namespace Assets.Code.Model {
             { EntitySubtype.Fuser, new GadgetCost[] {
                 new GadgetCost(1, 30 * 100, null),
             } },
+            { EntitySubtype.Lab, new GadgetCost[] {
+                new GadgetCost(1, 50 * 100, null),
+            } },
         };
 
         // TREES
@@ -49,6 +52,9 @@ namespace Assets.Code.Model {
         public Vector2Int[] highlightCoors;
         public bool cameraTakeover;
         public Vector3 cameraTargetPosition;
+        public Research research;
+        public HashSet<int> fruitsResearched;
+        public HashSet<ResearchFlags> researchFlags;
         public int timeScaleMinIndex, timeScaleMaxIndex;
 
         public Progression(State state) {
@@ -56,6 +62,8 @@ namespace Assets.Code.Model {
             maxCents = WALLET_SIZES[0];
             maxFruit = FRUIT_WALLET_SIZES[0];
             gadgetCosts = new Dictionary<EntitySubtype, GadgetCost>();
+            fruitsResearched = new HashSet<int>();
+            researchFlags = new HashSet<ResearchFlags>();
             timeScaleMinIndex = Array.IndexOf(TIMESCALES, 1);
             timeScaleMaxIndex = timeScaleMinIndex;
 
@@ -96,13 +104,46 @@ namespace Assets.Code.Model {
                 phase = ProgressionPhase.TutorialFuser;
                 state.RemoveEntityAtCoor(COOR_TUTORIAL_BLOCKER_MARKET);
                 state.CleanUpFruits();
+                state.CleanUpGadgets();
                 state.SpawnEntity(new EntityMarket(state, COOR_TUTORIAL_FUSER_MARKET));
                 cameraTakeover = true;
                 cameraTargetPosition = new Vector3(-2.5f, 0, 0);
             }
+            if (phase == ProgressionPhase.TutorialFuser && state.fruitProcessedCounts.ContainsKey(9)) {
+                phase = ProgressionPhase.FuserMoney;
+                UnlockPurchase(EntitySubtype.Lab);
+            }
+            if (phase == ProgressionPhase.FuserMoney && state.cents >= GADGET_COSTS[EntitySubtype.Lab][0].cents) {
+                phase = ProgressionPhase.TutorialResearch;
+            }
         }
         void UnlockPurchase(EntitySubtype gadgetType) {
             gadgetCosts[gadgetType] = GADGET_COSTS[gadgetType][0];
+        }
+
+        public bool CanResearch(EntityFruit fruit) {
+            if (fruitsResearched.Contains(fruit.mass)) {
+                return false;
+            }
+            if (Util.GetFruitResearchGoalFromMass(fruit.mass) == -1) {
+                return false;
+            }
+            return research == null || research.mass == fruit.mass;
+        }
+        public void IncrementResearch(EntityFruit fruit) {
+            Debug.Assert(fruit.mass == research.mass);
+            if (research == null) {
+                research = new Research(fruit.mass, Util.GetFruitResearchGoalFromMass(fruit.mass));
+            }
+            research.progress++;
+            if (research.progress >= research.goal) {
+                fruitsResearched.Add(research.mass);
+                // TODO: Put flags to indicate rewards into the Util map.
+                if (research.mass == 9) {
+                    researchFlags.Add(ResearchFlags.ConditionalFlingers);
+                }
+                research = null;
+            }
         }
     }
 
@@ -113,6 +154,8 @@ namespace Assets.Code.Model {
         SecondTree = 3,
         SecondTreeMoney = 4,
         TutorialFuser = 5,
+        FuserMoney = 6,
+        TutorialResearch = 7,
     }
 
     public class GadgetCost {
@@ -125,5 +168,18 @@ namespace Assets.Code.Model {
             this.cents = cents;
             this.massesAndAmounts = massesAndAmounts ?? new Vector2Int[0];
         }
+    }
+
+    public class Research {
+        public int mass, progress, goal;
+
+        public Research(int mass, int goal) {
+            this.mass = mass;
+            this.progress = 0;
+            this.goal = goal;
+        }
+    }
+    public enum ResearchFlags {
+        ConditionalFlingers,
     }
 }

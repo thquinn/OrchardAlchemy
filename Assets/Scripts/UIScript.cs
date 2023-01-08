@@ -1,3 +1,4 @@
+using Assets.Code;
 using Assets.Code.Model;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,20 +14,23 @@ public class UIScript : MonoBehaviour
         { ProgressionPhase.TutorialBlocker, "Place a Blocker in the highlighted spot, then use another Flinger to reach the new Market." },
         { ProgressionPhase.SecondTree, "Sell apples and pears." },
         { ProgressionPhase.SecondTreeMoney, "Sell fruit until you can afford a Fuser." },
+        { ProgressionPhase.TutorialFuser, "Fuse an apple and pear into a quince." },
+        { ProgressionPhase.TutorialResearch, "Research the quince." },
     };
 
     public GameObject prefabFruitCost;
 
     public BoardManagerScript boardManagerScript;
-    public TextMeshProUGUI tmpMoney, tmpTutorial, tmpTimescale;
-    public CanvasGroup canvasGroupMoney, canvasGroupFruit, canvasGroupGadgetDrawerButton, canvasGroupTickRate, canvasGroupSlowDown, canvasGroupSpeedUp;
+    public TextMeshProUGUI tmpMoney, tmpResearchProgress, tmpResearchName, tmpResearchMass, tmpTutorial, tmpTimescale;
+    public CanvasGroup canvasGroupMoney, canvasGroupResearch, canvasGroupFruit, canvasGroupGadgetDrawerButton, canvasGroupTickRate, canvasGroupSlowDown, canvasGroupSpeedUp;
     public RectTransform rectTransformFruitPanel;
-    public Image imageTickDisc;
+    public Image imageTickDisc, imageResearchFruitGradient;
 
     float lastMoney, vMoney;
-    float vAlphaMoney, vAlphaFruit, vAlphaGadgetDrawerButton;
+    float vAlphaMoney, vAlphaResearch, vAlphaFruit, vAlphaGadgetDrawerButton;
     Dictionary<int, FruitCostRowScript> massToFruitRowScripts;
     float lastTimeScale;
+    Research lastResearch;
 
     void Start() {
         massToFruitRowScripts = new Dictionary<int, FruitCostRowScript>();
@@ -36,12 +40,23 @@ public class UIScript : MonoBehaviour
         State state = boardManagerScript.state;
         bool showMoney = state.totalCentsEarned > 0;
         canvasGroupMoney.alpha = Mathf.SmoothDamp(canvasGroupMoney.alpha, showMoney ? 1 : 0, ref vAlphaMoney, .2f, float.MaxValue, Time.unscaledDeltaTime);
-        bool showFruit = showMoney && state.storedFruit.Count > 0 && state.progression.gadgetCosts.ContainsKey(EntitySubtype.Storage);
+        bool showResearch = state.progression.research != null;
+        canvasGroupResearch.alpha = Mathf.SmoothDamp(canvasGroupResearch.alpha, showResearch ? 1 : 0, ref vAlphaResearch, .2f, float.MaxValue, Time.unscaledDeltaTime);
+        bool showFruit = state.storedFruit.Count > 0 && state.progression.gadgetCosts.ContainsKey(EntitySubtype.Storage);
         canvasGroupFruit.alpha = Mathf.SmoothDamp(canvasGroupFruit.alpha, showFruit ? 1 : 0, ref vAlphaFruit, .2f, float.MaxValue, Time.unscaledDeltaTime);
         bool showGadgetDrawerButton = state.progression.phase >= ProgressionPhase.TutorialFlinger;
         canvasGroupGadgetDrawerButton.alpha = Mathf.SmoothDamp(canvasGroupGadgetDrawerButton.alpha, showGadgetDrawerButton ? 1 : 0, ref vAlphaGadgetDrawerButton, .2f, float.MaxValue, Time.unscaledDeltaTime);
         lastMoney = Mathf.SmoothDamp(lastMoney, state.cents, ref vMoney, .1f);
-        tmpMoney.text = string.Format("${0}<size=50%> / ${1}", (lastMoney / 100).ToString("N2"), state.progression.maxCents / 100);
+        tmpMoney.text = string.Format("${0}<size=40%> max ${1}", (lastMoney / 100).ToString("N2"), state.progression.maxCents / 100);
+        // Update research.
+        if (state.progression.research != lastResearch) {
+            lastResearch = state.progression.research;
+            tmpResearchName.text = Util.GetFruitNameFromMass(lastResearch.mass);
+            imageResearchFruitGradient.color = Util.GetFruitColorFromMass(lastResearch.mass);
+        }
+        if (lastResearch != null) {
+            tmpResearchName.text = string.Format("{0}%<size=40%> {1}/{2}", Util.GetRoundedProgressPercent((float)lastResearch.progress / lastResearch.goal), lastResearch.progress, lastResearch.goal);
+        }
         // Update fruits.
         bool fruitsChanged = false;
         List<int> displayedMasses = new List<int>(massToFruitRowScripts.Keys);

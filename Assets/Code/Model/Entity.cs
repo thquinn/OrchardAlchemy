@@ -8,6 +8,7 @@ using UnityEngine;
 namespace Assets.Code.Model {
     public abstract class Entity {
         public State state;
+        public Progression progression;
         public Vector2Int coor;
         public EntityType type;
         public EntitySubtype subtype;
@@ -15,6 +16,7 @@ namespace Assets.Code.Model {
 
         public Entity(State state, Vector2Int coor, EntityType type) {
             this.state = state;
+            progression = state?.progression;
             this.coor = coor;
             this.type = type;
         }
