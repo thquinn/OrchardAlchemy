@@ -131,9 +131,10 @@ namespace Assets.Code.Model {
             return research == null || research.mass == fruit.mass;
         }
         public void IncrementResearch(EntityFruit fruit) {
-            Debug.Assert(fruit.mass == research.mass);
             if (research == null) {
                 research = new Research(fruit.mass, Util.GetFruitResearchGoalFromMass(fruit.mass));
+            } else {
+                Debug.Assert(fruit.mass == research.mass);
             }
             research.progress++;
             if (research.progress >= research.goal) {

@@ -47,7 +47,7 @@ public class ModalScript : MonoBehaviour
         }
         foreach (string imageName in info.imageNames) {
             GameObject image = Instantiate(prefabModalImage, rectTransformImages);
-            image.GetComponentInChildren<Image>().sprite = tutorialSprites.First(s => s.name == imageName);
+            image.transform.GetChild(0).GetComponent<Image>().sprite = tutorialSprites.First(s => s.name == imageName);
         }
         tmpExplanation.text = info.explanation;
         canvasGroup.alpha = 1;

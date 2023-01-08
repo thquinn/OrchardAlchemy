@@ -14,8 +14,9 @@ public class UIScript : MonoBehaviour
         { ProgressionPhase.TutorialBlocker, "Place a Blocker in the highlighted spot, then use another Flinger to reach the new Market." },
         { ProgressionPhase.SecondTree, "Sell apples and pears." },
         { ProgressionPhase.SecondTreeMoney, "Sell fruit until you can afford a Fuser." },
-        { ProgressionPhase.TutorialFuser, "Fuse an apple and pear into a quince." },
-        { ProgressionPhase.TutorialResearch, "Research the quince." },
+        { ProgressionPhase.TutorialFuser, "Fuse an apple and pear into a quince, then sell it." },
+        { ProgressionPhase.FuserMoney, "Earn money to buy a Lab." },
+        { ProgressionPhase.TutorialResearch, "Use a Lab to research the quince." },
     };
 
     public GameObject prefabFruitCost;
@@ -51,11 +52,14 @@ public class UIScript : MonoBehaviour
         // Update research.
         if (state.progression.research != lastResearch) {
             lastResearch = state.progression.research;
-            tmpResearchName.text = Util.GetFruitNameFromMass(lastResearch.mass);
-            imageResearchFruitGradient.color = Util.GetFruitColorFromMass(lastResearch.mass);
+            if (lastResearch != null) {
+                tmpResearchName.text = Util.GetFruitNameFromMass(lastResearch.mass);
+                tmpResearchMass.text = lastResearch.mass.ToString();
+                imageResearchFruitGradient.color = Util.GetFruitColorFromMass(lastResearch.mass);
+            }
         }
         if (lastResearch != null) {
-            tmpResearchName.text = string.Format("{0}%<size=40%> {1}/{2}", Util.GetRoundedProgressPercent((float)lastResearch.progress / lastResearch.goal), lastResearch.progress, lastResearch.goal);
+            tmpResearchProgress.text = string.Format("{0}%<size=40%> {1}/{2}", Util.GetRoundedProgressPercent((float)lastResearch.progress / lastResearch.goal), lastResearch.progress, lastResearch.goal);
         }
         // Update fruits.
         bool fruitsChanged = false;

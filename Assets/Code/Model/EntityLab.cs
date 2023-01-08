@@ -14,15 +14,23 @@ namespace Assets.Code.Model {
             presentAtStart = new List<Entity>();
         }
 
-        public override void TickConsume() {
+        public override void TickStart() {
             base.TickStart();
             presentAtStart.Clear();
             foreach (Vector2Int direction in Util.ALL_DIRECTIONS) {
                 Vector2Int fruitCoor = coor + direction;
                 if (state.GetTypeAtCoor(fruitCoor) == EntityType.Fruit) {
+                    presentAtStart.Add(state.entities[fruitCoor]);
+                }
+            }
+        }
+        public override void TickConsume() {
+            foreach (Vector2Int direction in Util.ALL_DIRECTIONS) {
+                Vector2Int fruitCoor = coor + direction;
+                if (state.GetTypeAtCoor(fruitCoor) == EntityType.Fruit) {
                     EntityFruit fruit = state.entities[fruitCoor] as EntityFruit;
-                    if (presentAtStart.Contains(fruit) && progression.CanResearch(fruit)) {
-                        progression.IncrementResearch(fruit);
+                    if (presentAtStart.Contains(fruit) && state.progression.CanResearch(fruit)) {
+                        state.progression.IncrementResearch(fruit);
                         state.RemoveEntity(fruit);
                         state.CountProcessedFruit(fruit);
                     }
