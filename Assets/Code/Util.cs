@@ -1,8 +1,5 @@
 ﻿using Assets.Code.Model;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Code {
@@ -26,6 +23,17 @@ namespace Assets.Code {
                 return FRUIT_MASS_TO_INFO[mass].researchGoal;
             }
             return -1;
+        }
+        public static string GetFruitResearchDescriptionFromMass(int mass) {
+            if (FRUIT_MASS_TO_INFO.ContainsKey(mass)) {
+                return FRUIT_MASS_TO_INFO[mass].researchDescription;
+            }
+            return "Unknown research...";
+        }
+        public static void InvokeResearchActionByMass(int mass, State state) {
+            if (FRUIT_MASS_TO_INFO.ContainsKey(mass)) {
+                FRUIT_MASS_TO_INFO[mass].researchAction.Invoke(state);
+            }
         }
         public static string GetFruitNameFromMass(int mass) {
             if (FRUIT_MASS_TO_INFO.ContainsKey(mass)) {
@@ -76,11 +84,31 @@ namespace Assets.Code {
 
         public static Vector2Int[] ALL_DIRECTIONS = new Vector2Int[] { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
         static Dictionary<int, FruitInfo> FRUIT_MASS_TO_INFO = new Dictionary<int, FruitInfo>() {
-            { 4, new FruitInfo("Apple", Color.red, 25) }, // wallet+
-            { 5, new FruitInfo("Pear", HexToColor("#D1E231"), 10) }, // money
-            { 8, new FruitInfo("Crabapple", HexToColor("#B00000"), 20) }, // storage
-            { 9, new FruitInfo("Quince", HexToColor("#FFEF00"), 20) }, // conditional flingers
-            { 10, new FruitInfo("Loquat", HexToColor("#EC983C"), 40) }, // timescale max+
+            { 4, new FruitInfo("Apple", Color.red, 25,
+                                "You discovered a bigger wallet! Your max money is increased by $100.",
+                                (state) => {
+                                    state.progression.maxCents += 100 * 100;
+                                }) },
+            { 5, new FruitInfo("Pear", HexToColor("#D1E231"), 10,
+                                "You discovered a <i>pair</i> of $50 bills... that's $100!",
+                                (state) => {
+                                    state.GetMoney(100 * 100, false);
+                                }) },
+            { 8, new FruitInfo("Crabapple", HexToColor("#B00000"), 20,
+                                "You discovered the Storage gadget! It moves adjacent fruit into your inventory, which you can use to buy gadgets.",
+                                (state) => {
+                                    state.progression.UnlockPurchase(EntitySubtype.Storage);
+                                }) },
+            { 9, new FruitInfo("Quince", HexToColor("#FFEF00"), 1,//20,
+                                "You discovered Conditional Flingers! Click Flingers to set conditions on them.",
+                                (state) => {
+                                    state.progression.researchFlags.Add(ResearchFlags.ConditionalFlingers);
+                                }) },
+            { 10, new FruitInfo("Loquat", HexToColor("#EC983C"), 40,
+                                "You discovered temporal secrets! You can make time pass faster.",
+                                (state) => {
+                                    state.progression.timeScaleMaxIndex++;
+                                }) },
         };
     }
 
@@ -101,11 +129,15 @@ namespace Assets.Code {
         public string name;
         public Color color;
         public int researchGoal;
+        public string researchDescription;
+        public System.Action<State> researchAction;
 
-        public FruitInfo(string name, Color color, int researchGoal) {
+        public FruitInfo(string name, Color color, int researchGoal, string researchDescription, System.Action<State> researchAction) {
             this.name = name;
             this.color = color;
             this.researchGoal = researchGoal;
+            this.researchDescription = researchDescription;
+            this.researchAction = researchAction;
         }
     }
 }

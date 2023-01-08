@@ -1,6 +1,5 @@
 using Assets.Code;
 using Assets.Code.Model;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -24,7 +23,7 @@ public class UIScript : MonoBehaviour
 
     public BoardManagerScript boardManagerScript;
     public TextMeshProUGUI tmpMoney, tmpResearchProgress, tmpResearchName, tmpResearchMass, tmpTutorial, tmpTimescale;
-    public CanvasGroup canvasGroupMoney, canvasGroupResearch, canvasGroupFruit, canvasGroupGadgetDrawerButton, canvasGroupTickRate, canvasGroupSlowDown, canvasGroupSpeedUp;
+    public CanvasGroup canvasGroupMoney, canvasGroupResearch, canvasGroupFruit, canvasGroupGadgetDrawerButton, canvasGroupTickRate, canvasGroupSlowDown, canvasGroupSpeedUp, canvasGroupCleanUpTutorial;
     public RectTransform rectTransformFruitPanel;
     public Image imageTickDisc, imageResearchFruitGradient;
 
@@ -56,7 +55,9 @@ public class UIScript : MonoBehaviour
             if (lastResearch != null) {
                 tmpResearchName.text = Util.GetFruitNameFromMass(lastResearch.mass);
                 tmpResearchMass.text = lastResearch.mass.ToString();
-                imageResearchFruitGradient.color = Util.GetFruitColorFromMass(lastResearch.mass);
+                Color c = Util.GetFruitColorFromMass(lastResearch.mass);
+                c.a = imageResearchFruitGradient.color.a;
+                imageResearchFruitGradient.color = c;
             }
         }
         if (lastResearch != null) {
@@ -101,5 +102,6 @@ public class UIScript : MonoBehaviour
             LayoutRebuilder.ForceRebuildLayoutImmediate(canvasGroupTickRate.transform as RectTransform);
             lastTimeScale = Time.timeScale;
         }
+        canvasGroupCleanUpTutorial.alpha = state.progression.phase == ProgressionPhase.TutorialBlocker ? 1 : 0;
     }
 }

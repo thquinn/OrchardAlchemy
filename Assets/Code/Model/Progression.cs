@@ -7,9 +7,7 @@ using UnityEngine;
 
 namespace Assets.Code.Model {
     public class Progression {
-        public static float[] TIMESCALES = new float[] { .25f, .5f, 1, 2, 3, 4, 6, 8 };
-        static ulong[] WALLET_SIZES = new ulong[] { 100*100, 500*100, 2500*100, 10000*100 };
-        static ulong[] FRUIT_WALLET_SIZES = new ulong[] { 10, 50, 250 };
+        public static float[] TIMESCALES = new float[] { .25f, .5f, 1, 1.5f, 2, 2.5f, 3 };
 
         // GADGET COSTS
         static Dictionary<EntitySubtype, GadgetCost[]> GADGET_COSTS = new Dictionary<EntitySubtype, GadgetCost[]>() {
@@ -25,6 +23,9 @@ namespace Assets.Code.Model {
             { EntitySubtype.Lab, new GadgetCost[] {
                 new GadgetCost(1, 50 * 100, null),
             } },
+            { EntitySubtype.Storage, new GadgetCost[] {
+                new GadgetCost(1, 20 * 100, null),
+            } },
         };
 
         // TREES
@@ -32,6 +33,10 @@ namespace Assets.Code.Model {
             new Vector3Int(4, 1, 1),
         };
         static Vector3Int[] TREE_PEAR = new Vector3Int[] {
+            new Vector3Int(5, 1, 1),
+        };
+        static Vector3Int[] TREE_APPLE_PEAR = new Vector3Int[] {
+            new Vector3Int(4, 1, 1),
             new Vector3Int(5, 1, 1),
         };
 
@@ -42,6 +47,8 @@ namespace Assets.Code.Model {
         static Vector2Int COOR_TUTORIAL_BLOCKER_POSITION = new Vector2Int(1, 0);
         static Vector2Int COOR_SECOND_TREE = new Vector2Int(5, 0);
         static Vector2Int COOR_TUTORIAL_FUSER_MARKET = new Vector2Int(-5, 8);
+        static Vector2Int COOR_THIRD_TREE = new Vector2Int(5, 5);
+        static Vector2Int COOR_FOURTH_TREE = new Vector2Int(1, -5);
 
         State state;
         public ProgressionPhase phase;
@@ -59,8 +66,8 @@ namespace Assets.Code.Model {
 
         public Progression(State state) {
             this.state = state;
-            maxCents = WALLET_SIZES[0];
-            maxFruit = FRUIT_WALLET_SIZES[0];
+            maxCents = 100 * 100;
+            maxFruit = 10;
             gadgetCosts = new Dictionary<EntitySubtype, GadgetCost>();
             fruitsResearched = new HashSet<int>();
             researchFlags = new HashSet<ResearchFlags>();
@@ -111,6 +118,7 @@ namespace Assets.Code.Model {
             }
             if (phase == ProgressionPhase.TutorialFuser && state.fruitProcessedCounts.ContainsKey(9)) {
                 phase = ProgressionPhase.FuserMoney;
+                state.SpawnTree(COOR_THIRD_TREE, TREE_APPLE, null);
                 UnlockPurchase(EntitySubtype.Lab);
             }
             if (phase == ProgressionPhase.FuserMoney && state.cents >= GADGET_COSTS[EntitySubtype.Lab][0].cents) {
@@ -121,9 +129,10 @@ namespace Assets.Code.Model {
             }
             if (phase == ProgressionPhase.TutorialResearchAgain && fruitsResearched.Count >= 2) {
                 phase = ProgressionPhase.TutorialOver;
+                state.SpawnTree(COOR_FOURTH_TREE, TREE_APPLE_PEAR, null);
             }
         }
-        void UnlockPurchase(EntitySubtype gadgetType) {
+        public void UnlockPurchase(EntitySubtype gadgetType) {
             gadgetCosts[gadgetType] = GADGET_COSTS[gadgetType][0];
         }
 
@@ -145,10 +154,7 @@ namespace Assets.Code.Model {
             research.progress++;
             if (research.progress >= research.goal) {
                 fruitsResearched.Add(research.mass);
-                // TODO: Put flags to indicate rewards into the Util map.
-                if (research.mass == 9) {
-                    researchFlags.Add(ResearchFlags.ConditionalFlingers);
-                }
+                Util.InvokeResearchActionByMass(research.mass, state);
                 research = null;
             }
         }
