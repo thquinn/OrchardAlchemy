@@ -19,7 +19,7 @@ public class CameraScript : MonoBehaviour
     void Update() {
         if (boardManagerScript.state.progression.cameraTakeover) {
             Vector3 targetPosition = boardManagerScript.state.progression.cameraTargetPosition;
-            float targetSize = 5;
+            float targetSize = boardManagerScript.state.progression.cameraTargetSize;
             targetPosition.z = transform.localPosition.z;
             transform.localPosition = Vector3.SmoothDamp(transform.localPosition, targetPosition, ref vPosition, .2f, float.MaxValue, Time.unscaledDeltaTime);
             if (targetSize != 0) {

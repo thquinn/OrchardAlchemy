@@ -130,6 +130,8 @@ public class BoardManagerScript : MonoBehaviour {
             GadgetCost cost = state.progression.gadgetCosts.ContainsKey(gadget.subtype) ? state.progression.gadgetCosts[gadget.subtype] : null;
             if (cost == null || !state.CheckAndPayCost(cost)) {
                 return;
+            } else {
+                state.progression.IncrementCost(gadget.subtype);
             }
         }
         // Create and drag.
@@ -154,5 +156,6 @@ public class BoardManagerScript : MonoBehaviour {
     public void RecenterCamera() {
         state.progression.cameraTakeover = true;
         state.progression.cameraTargetPosition = Vector3.zero;
+        state.progression.cameraTargetSize = 5;
     }
 }

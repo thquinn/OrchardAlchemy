@@ -12,19 +12,29 @@ namespace Assets.Code.Model {
         // GADGET COSTS
         static Dictionary<EntitySubtype, GadgetCost[]> GADGET_COSTS = new Dictionary<EntitySubtype, GadgetCost[]>() {
             { EntitySubtype.Blocker, new GadgetCost[] {
-                new GadgetCost(5, 5 * 100, null),
+                new GadgetCost(999, 5 * 100, null),
             } },
             { EntitySubtype.Flinger, new GadgetCost[] {
-                new GadgetCost(5, 10 * 100, null),
+                new GadgetCost(10, 10 * 100, null),
+                new GadgetCost(20, 10 * 100, new Vector2Int[] { new Vector2Int(9, 1) }),
+                new GadgetCost(999, 20 * 100, new Vector2Int[] { new Vector2Int(9, 2) }),
             } },
             { EntitySubtype.Fuser, new GadgetCost[] {
-                new GadgetCost(1, 30 * 100, null),
+                new GadgetCost(2, 30 * 100, null),
+                new GadgetCost(4, 40 * 100, null),
+                new GadgetCost(6, 50 * 100, null),
+                new GadgetCost(999, 50 * 100, new Vector2Int[] { new Vector2Int(3, 1) }),
             } },
             { EntitySubtype.Lab, new GadgetCost[] {
                 new GadgetCost(1, 50 * 100, null),
+                new GadgetCost(1, 100 * 100, null),
+                new GadgetCost(999, 200 * 100, new Vector2Int[] { new Vector2Int(7, 1) }),
             } },
             { EntitySubtype.Storage, new GadgetCost[] {
-                new GadgetCost(1, 20 * 100, null),
+                new GadgetCost(5, 20 * 100, null),
+                new GadgetCost(5, 40 * 100, null),
+                new GadgetCost(5, 80 * 100, null),
+                new GadgetCost(999, 160 * 100, new Vector2Int[] { new Vector2Int(8, 1) }),
             } },
         };
 
@@ -71,6 +81,7 @@ namespace Assets.Code.Model {
         public Vector2Int[] highlightCoors;
         public bool cameraTakeover;
         public Vector3 cameraTargetPosition;
+        public int cameraTargetSize;
         public Research research;
         public HashSet<int> fruitsResearched;
         public HashSet<ResearchFlags> researchFlags;
@@ -82,6 +93,7 @@ namespace Assets.Code.Model {
             maxCents = 100 * 100;
             maxFruit = 10;
             gadgetCosts = new Dictionary<EntitySubtype, GadgetCost>();
+            gadgetCostIndex = new Dictionary<EntitySubtype, int>();
             fruitsResearched = new HashSet<int>();
             researchFlags = new HashSet<ResearchFlags>();
             timeScaleMinIndex = Array.IndexOf(TIMESCALES, 1);
@@ -106,7 +118,8 @@ namespace Assets.Code.Model {
                 state.StoreGadgetType(EntitySubtype.Flinger);
                 highlightCoors = new Vector2Int[] { COOR_TUTORIAL_BLOCKER_POSITION };
                 cameraTakeover = true;
-                cameraTargetPosition = new Vector3(0, 4, 0);
+                cameraTargetPosition = new Vector3(0, 3, 0);
+                cameraTargetSize = 7;
             }
             if (phase == ProgressionPhase.TutorialBlocker && state.totalCentsEarned >= 1000) {
                 state.CleanUpFruits();
@@ -127,7 +140,8 @@ namespace Assets.Code.Model {
                 state.CleanUpGadgets();
                 state.SpawnEntity(new EntityMarket(state, COOR_TUTORIAL_FUSER_MARKET));
                 cameraTakeover = true;
-                cameraTargetPosition = new Vector3(-2.5f, 0, 0);
+                cameraTargetPosition = new Vector3(0, 4, 0);
+                cameraTargetSize = 7;
             }
             if (phase == ProgressionPhase.TutorialFuser && state.fruitProcessedCounts.ContainsKey(9)) {
                 phase = ProgressionPhase.FuserMoney;
@@ -150,6 +164,16 @@ namespace Assets.Code.Model {
         }
         public void UnlockPurchase(EntitySubtype gadgetType) {
             gadgetCosts[gadgetType] = GADGET_COSTS[gadgetType][0];
+            gadgetCostIndex[gadgetType] = 0;
+        }
+
+        public void IncrementCost(EntitySubtype gadgetType) {
+            GadgetCost cost = gadgetCosts[gadgetType];
+            cost.stockAmount--;
+            if (cost.stockAmount <= 0 && gadgetCostIndex[gadgetType] < GADGET_COSTS[gadgetType].Length - 1) {
+                gadgetCostIndex[gadgetType]++;
+                gadgetCosts[gadgetType] = GADGET_COSTS[gadgetType][gadgetCostIndex[gadgetType]];
+            }
         }
 
         public bool CanResearch(EntityFruit fruit) {

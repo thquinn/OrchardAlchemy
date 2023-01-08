@@ -13,7 +13,7 @@ public class UIScript : MonoBehaviour
         { ProgressionPhase.TutorialBlocker, "Place a Blocker in the highlighted spot, then use another Flinger to reach the new Market." },
         { ProgressionPhase.SecondTree, "Sell apples and pears." },
         { ProgressionPhase.SecondTreeMoney, "Sell fruit until you can afford a Fuser." },
-        { ProgressionPhase.TutorialFuser, "Fuse an apple and pear into a quince, then sell it." },
+        { ProgressionPhase.TutorialFuser, "Fuse an apple and pear into a quince,\nthen sell it." },
         { ProgressionPhase.FuserMoney, "Earn money to buy a Lab." },
         { ProgressionPhase.TutorialResearch, "Each fruit can be researched for a unique effect. Use a Lab to research the quince." },
         { ProgressionPhase.TutorialResearchAgain, "Use the Lab to research any other fruit." },
@@ -65,7 +65,6 @@ public class UIScript : MonoBehaviour
             LayoutRebuilder.ForceRebuildLayoutImmediate(tmpResearchProgress.transform.parent as RectTransform);
         }
         // Update fruits.
-        bool fruitsChanged = false;
         List<int> displayedMasses = new List<int>(massToFruitRowScripts.Keys);
         foreach (int displayedMass in displayedMasses) {
             if (state.storedFruit.ContainsKey(displayedMass)) {
@@ -73,20 +72,22 @@ public class UIScript : MonoBehaviour
             } else {
                 Destroy(massToFruitRowScripts[displayedMass].gameObject);
                 massToFruitRowScripts.Remove(displayedMass);
-                fruitsChanged = true;
             }
         }
         foreach (int storedMass in state.storedFruit.Keys) {
             if (!massToFruitRowScripts.ContainsKey(storedMass)) {
                 FruitCostRowScript fruitCostRowScript = Instantiate(prefabFruitCost, rectTransformFruitPanel).GetComponent<FruitCostRowScript>();
+                fruitCostRowScript.gameObject.name = storedMass.ToString();
+                int siblingIndex = rectTransformFruitPanel.childCount - 1;
+                while (siblingIndex > 0 && int.Parse(rectTransformFruitPanel.GetChild(siblingIndex - 1).name) > storedMass) {
+                    siblingIndex--;
+                }
+                fruitCostRowScript.transform.SetSiblingIndex(siblingIndex);
                 fruitCostRowScript.Init(storedMass, state.storedFruit[storedMass]);
                 massToFruitRowScripts[storedMass] = fruitCostRowScript;
-                fruitsChanged = true;
             }
         }
-        if (fruitsChanged) {
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransformFruitPanel);
-        }
+        LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransformFruitPanel);
         // Update tutorial.
         tmpTutorial.text = TUTORIAL_STRINGS.ContainsKey(state.progression.phase) ? TUTORIAL_STRINGS[state.progression.phase] : "";
         // Update buttons.
