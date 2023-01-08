@@ -16,7 +16,8 @@ public class UIScript : MonoBehaviour
         { ProgressionPhase.SecondTreeMoney, "Sell fruit until you can afford a Fuser." },
         { ProgressionPhase.TutorialFuser, "Fuse an apple and pear into a quince, then sell it." },
         { ProgressionPhase.FuserMoney, "Earn money to buy a Lab." },
-        { ProgressionPhase.TutorialResearch, "Use a Lab to research the quince." },
+        { ProgressionPhase.TutorialResearch, "Each fruit can be researched for a unique effect. Use a Lab to research the quince." },
+        { ProgressionPhase.TutorialResearchAgain, "Use the Lab to research any other fruit." },
     };
 
     public GameObject prefabFruitCost;
@@ -60,6 +61,7 @@ public class UIScript : MonoBehaviour
         }
         if (lastResearch != null) {
             tmpResearchProgress.text = string.Format("{0}%<size=40%> {1}/{2}", Util.GetRoundedProgressPercent((float)lastResearch.progress / lastResearch.goal), lastResearch.progress, lastResearch.goal);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(tmpResearchProgress.transform.parent as RectTransform);
         }
         // Update fruits.
         bool fruitsChanged = false;

@@ -35,13 +35,10 @@ namespace Assets.Code.Model {
             pendingThrows.Add(new PendingThrow(entity, direction, distance));
         }
 
-        public bool SpawnEntity(Entity entity) {
-            if (!entities.ContainsKey(entity.coor)) {
-                entities[entity.coor] = entity;
-                entity.state = this;
-                return true;
-            }
-            return false;
+        public void SpawnEntity(Entity entity) {
+            entity.coor = GetNearestOpenCoor(entity.coor);
+            entities[entity.coor] = entity;
+            entity.state = this;
         }
         public void SpawnTree(Vector2Int coor, Vector3Int[] fruitTypesAndWeights, Vector2Int[] directions) {
             EntityTree tree = new EntityTree(this, coor, fruitTypesAndWeights, directions);
@@ -50,6 +47,25 @@ namespace Assets.Code.Model {
         public void SpawnFruit(Vector2Int coor, int mass, int reactivity) {
             EntityFruit fruit = new EntityFruit(this, coor, mass, reactivity);
             SpawnEntity(fruit);
+        }
+        static Vector2Int[] SPAWN_SEARCH_DIAGONALS = new Vector2Int[] { new Vector2Int(-1, 1), new Vector2Int(-1, -1), new Vector2Int(1, -1), new Vector2Int(1, 1) };
+        Vector2Int GetNearestOpenCoor(Vector2Int coor) {
+            if (!entities.ContainsKey(coor)) {
+                return coor;
+            }
+            int numSteps = 1;
+            while (true) {
+                coor += Vector2Int.right;
+                foreach (Vector2Int direction in SPAWN_SEARCH_DIAGONALS) {
+                    for (int i = 0; i < numSteps; i++) {
+                        if (!entities.ContainsKey(coor)) {
+                            return coor;
+                        }
+                        coor += direction;
+                    }
+                }
+                numSteps++;
+            }
         }
 
         public void RemoveEntity(Entity entity) {

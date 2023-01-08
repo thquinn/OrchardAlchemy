@@ -116,6 +116,12 @@ namespace Assets.Code.Model {
             if (phase == ProgressionPhase.FuserMoney && state.cents >= GADGET_COSTS[EntitySubtype.Lab][0].cents) {
                 phase = ProgressionPhase.TutorialResearch;
             }
+            if (phase == ProgressionPhase.TutorialResearch && fruitsResearched.Contains(9)) {
+                phase = ProgressionPhase.TutorialResearchAgain;
+            }
+            if (phase == ProgressionPhase.TutorialResearchAgain && fruitsResearched.Count >= 2) {
+                phase = ProgressionPhase.TutorialOver;
+            }
         }
         void UnlockPurchase(EntitySubtype gadgetType) {
             gadgetCosts[gadgetType] = GADGET_COSTS[gadgetType][0];
@@ -157,6 +163,8 @@ namespace Assets.Code.Model {
         TutorialFuser = 5,
         FuserMoney = 6,
         TutorialResearch = 7,
+        TutorialResearchAgain = 8,
+        TutorialOver = 9,
     }
 
     public class GadgetCost {

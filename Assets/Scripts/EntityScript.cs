@@ -127,6 +127,12 @@ public class EntityGadgetHandler : EntityScriptHandler {
         script.rendererIcon.gameObject.SetActive(true);
         script.rendererIcon.sprite = script.icons.First(i => i.name == "icon_gadget_" + gadget.name.ToLower());
     }
+    public override void Update() {
+        if (gadget.subtype == EntitySubtype.Flinger) {
+            bool hasCondition = (gadget as EntityFlinger).condition != null;
+            script.tmpName.text = hasCondition ? "Conditional Flinger" : "Flinger";
+        }
+    }
 }
 
 public class EntityFixtureHandler : EntityScriptHandler {

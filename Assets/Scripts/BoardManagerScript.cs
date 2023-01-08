@@ -10,7 +10,7 @@ public class BoardManagerScript : MonoBehaviour {
 
     public StorageButtonScript storageButtonScript;
 
-    Camera cam;
+    public Camera cam;
     public State state;
     Dictionary<Entity, EntityScript> entityScripts;
     Entity draggedEntity;
@@ -36,6 +36,9 @@ public class BoardManagerScript : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.F2)) {
             Time.timeScale += 1;
+        }
+        if (Input.GetKeyDown(KeyCode.F3)) {
+            state.progression.researchFlags.Add(ResearchFlags.ConditionalFlingers);
         }
     }
     void Tick() {
@@ -81,8 +84,10 @@ public class BoardManagerScript : MonoBehaviour {
         if (!Input.GetMouseButton(0) || !IsDraggableType(draggedEntity.type)) {
             bool storageHovered = storageButtonScript.hovered;
             draggedEntity.coor = coor;
-            if (storageHovered || !state.SpawnEntity(draggedEntity)) {
+            if (storageHovered) {
                 state.StoreEntity(draggedEntity);
+            } else {
+                state.SpawnEntity(draggedEntity);
             }
             EntityCheck();
             draggedEntity = null;
