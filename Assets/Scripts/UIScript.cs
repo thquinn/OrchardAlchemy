@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class UIScript : MonoBehaviour
 {
     static Dictionary<ProgressionPhase, string> TUTORIAL_STRINGS = new Dictionary<ProgressionPhase, string>() {
-        { ProgressionPhase.Start, "Right-click-drag to pan, scroll wheel to zoom.\nDrag apples next to the Market to sell them." },
+        { ProgressionPhase.Start, "Drag apples next to the Market to sell them.\nRight-click-drag to pan, scroll wheel to zoom." },
         { ProgressionPhase.TutorialFlinger, "Click the button in the lower right and drag a Flinger onto the highlighted spot." },
         { ProgressionPhase.TutorialBlocker, "Place a Blocker in the highlighted spot, then use another Flinger to reach the new Market." },
         { ProgressionPhase.SecondTree, "Sell apples and pears." },
@@ -30,7 +30,6 @@ public class UIScript : MonoBehaviour
     float lastMoney, vMoney;
     float vAlphaMoney, vAlphaResearch, vAlphaFruit, vAlphaGadgetDrawerButton;
     Dictionary<int, FruitCostRowScript> massToFruitRowScripts;
-    float lastTimeScale;
     Research lastResearch;
 
     void Start() {
@@ -92,17 +91,14 @@ public class UIScript : MonoBehaviour
         tmpTutorial.text = TUTORIAL_STRINGS.ContainsKey(state.progression.phase) ? TUTORIAL_STRINGS[state.progression.phase] : "";
         // Update buttons.
         imageTickDisc.material.SetFloat("_Revealed", Time.time % 1);
-        if (Time.timeScale != lastTimeScale) {
-            bool showTimeControls = state.progression.timeScaleMinIndex != state.progression.timeScaleMaxIndex;
-            bool showSlowDown = showTimeControls && boardManagerScript.timescaleIndex > state.progression.timeScaleMinIndex;
-            bool showSpeedUp = showTimeControls && boardManagerScript.timescaleIndex < state.progression.timeScaleMaxIndex;
-            canvasGroupSlowDown.alpha = showSlowDown ? 1 : 0;
-            canvasGroupSpeedUp.alpha = showSpeedUp ? 1 : 0;
-            tmpTimescale.text = Time.timeScale.ToString();
-            canvasGroupTickRate.alpha = Time.timeScale == 1 ? 0 : 1;
-            LayoutRebuilder.ForceRebuildLayoutImmediate(canvasGroupTickRate.transform as RectTransform);
-            lastTimeScale = Time.timeScale;
-        }
+        bool showTimeControls = state.progression.timeScaleMinIndex != state.progression.timeScaleMaxIndex;
+        bool showSlowDown = showTimeControls && boardManagerScript.timescaleIndex > state.progression.timeScaleMinIndex;
+        bool showSpeedUp = showTimeControls && boardManagerScript.timescaleIndex < state.progression.timeScaleMaxIndex;
+        canvasGroupSlowDown.alpha = showSlowDown ? 1 : 0;
+        canvasGroupSpeedUp.alpha = showSpeedUp ? 1 : 0;
+        tmpTimescale.text = Time.timeScale.ToString();
+        canvasGroupTickRate.alpha = Time.timeScale == 1 ? 0 : 1;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(canvasGroupTickRate.transform as RectTransform);
         canvasGroupCleanUpTutorial.alpha = state.progression.phase == ProgressionPhase.TutorialBlocker ? 1 : 0;
     }
 }

@@ -35,21 +35,16 @@ public class BoardManagerScript : MonoBehaviour {
             state.GetMoney(10000000);
         }
         if (Input.GetKeyDown(KeyCode.F2)) {
-            Time.timeScale += 1;
+            state.progression.timeScaleMaxIndex = Progression.TIMESCALES.Length - 1;
         }
         if (Input.GetKeyDown(KeyCode.F3)) {
-            state.progression.researchFlags.Add(ResearchFlags.ApproximateResearch);
-            state.progression.researchFlags.Add(ResearchFlags.ConditionalFlingers);
-            state.progression.researchFlags.Add(ResearchFlags.PrimeBonus);
-            state.progression.researchFlags.Add(ResearchFlags.SuperLemon);
-        }
-        if (Input.GetKeyDown(KeyCode.F4)) {
-            state.SpawnHalfVictory();
-        }
-        if (Input.GetKeyDown(KeyCode.F5)) {
+            state.StoreGadgetType(EntitySubtype.Blocker);
+            state.StoreGadgetType(EntitySubtype.Flinger);
+            state.StoreGadgetType(EntitySubtype.Fuser);
+            state.StoreGadgetType(EntitySubtype.Lab);
             state.StoreGadgetType(EntitySubtype.Storage);
         }
-        if (Input.GetKeyDown(KeyCode.F6)) {
+        if (Input.GetKeyDown(KeyCode.F4)) {
             state.progression.SpawnEpoch();
             EntityCheck();
         }

@@ -55,6 +55,7 @@ public class GadgetRowScript : MonoBehaviour
             foreach (Vector2Int massAndAmount in cost.massesAndAmounts) {
                 Instantiate(prefabFruitCostRow, rectTransformCostSection).GetComponent<FruitCostRowScript>().Init(massAndAmount.x, (ulong) massAndAmount.y);
             }
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransformCostSection);
         }
     }
 }

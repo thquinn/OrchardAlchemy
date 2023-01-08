@@ -180,7 +180,7 @@ namespace Assets.Code {
             { 10, new FruitInfo("Loquat", HexToColor("#EC983C"), 40,
                                 "You discovered temporal secrets! You can make time pass faster.",
                                 (state) => {
-                                    state.progression.timeScaleMaxIndex++;
+                                    state.progression.timeScaleMaxIndex = Mathf.Min(state.progression.timeScaleMaxIndex + 1, Progression.TIMESCALES.Length - 1);
                                 }) },
             { 11, new FruitInfo("Raspberry", HexToColor("#E30B5C"), 33,
                                 "You discovered half of a victory...",
