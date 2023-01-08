@@ -65,11 +65,12 @@ Shader "thquinn/Grass"
                 float wind = tex2D(_WindTex, windUV);
                 wind = lerp(.4, .6, wind);
                 float2 mainUV = i.worldSpacePos * .441;
-                mainUV.xy += wind * .2;
+                mainUV.xy += float2(wind * .3, wind * .1);
                 float main = tex2D(_MainTex, mainUV);
                 main = lerp(.8, 1.2, main);
                 float glint = pow(tex2D(_WindTex, windUV) * main, 10);
-                main += glint * .2;
+                glint *= (1 - lerp(0, .5, _Fade));
+                main += glint * .3;
                 float2 gridUV = i.worldSpacePos;
                 gridUV.y -= .01;
                 float grid = tex2D(_GridTex, gridUV);

@@ -84,14 +84,21 @@ namespace Assets.Code.Model {
         }
         public void StoreEntity(Entity entity) {
             if (entity.type == EntityType.Fruit) {
-                int mass = (entity as EntityFruit).mass;
+                EntityFruit fruit = entity as EntityFruit;
+                int mass = fruit.mass;
                 if (!storedFruit.ContainsKey(mass)) {
                     storedFruit[mass] = 1;
                 } else {
                     storedFruit[mass]++;
                 }
+                CountProcessedFruit(fruit);
             } else if (entity.type == EntityType.Gadget) {
                 StoreGadgetType(entity.subtype);
+            } else {
+                throw new Exception("Trying to store unstorable entity of type: " + entity.type);
+            }
+            if (entity.state != null) {
+                RemoveEntity(entity);
             }
         }
         public void StoreGadgetType(EntitySubtype subtype) {
@@ -113,6 +120,22 @@ namespace Assets.Code.Model {
                 }
             } else if (entity.type == EntityType.Gadget) {
                 storedGadgets[entity.subtype]--;
+            }
+        }
+        public void CleanUpFruits() {
+            List<Vector2Int> coors = new List<Vector2Int>(entities.Keys);
+            foreach (Vector2Int coor in coors) {
+                if (entities[coor].type == EntityType.Fruit) {
+                    StoreEntity(entities[coor]);
+                }
+            }
+        }
+        public void CleanUpGadgets() {
+            List<Vector2Int> coors = new List<Vector2Int>(entities.Keys);
+            foreach (Vector2Int coor in coors) {
+                if (entities[coor].type == EntityType.Gadget) {
+                    StoreEntity(entities[coor]);
+                }
             }
         }
         public void CountProcessedFruit(EntityFruit fruit) {
@@ -149,12 +172,12 @@ namespace Assets.Code.Model {
                 entity.TickStart();
             }
             foreach (Entity entity in entitiesThisTurn) {
+                entity.TickConsume();
+            }
+            foreach (Entity entity in entitiesThisTurn) {
                 entity.TickThrow();
             }
             PerformPendingThrows();
-            foreach (Entity entity in entitiesThisTurn) {
-                entity.TickConsume();
-            }
             foreach (Entity entity in entitiesThisTurn) {
                 entity.TickSpawn();
             }

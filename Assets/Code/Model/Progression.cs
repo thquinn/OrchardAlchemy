@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Assets.Code.Model {
     public class Progression {
+        public static float[] TIMESCALES = new float[] { .25f, .5f, 1, 2, 3, 4, 6, 8 };
         static ulong[] WALLET_SIZES = new ulong[] { 100*100, 500*100, 2500*100, 10000*100 };
         static ulong[] FRUIT_WALLET_SIZES = new ulong[] { 10, 50, 250 };
 
@@ -19,7 +20,7 @@ namespace Assets.Code.Model {
                 new GadgetCost(5, 10 * 100, null),
             } },
             { EntitySubtype.Fuser, new GadgetCost[] {
-                new GadgetCost(1, 50 * 100, null),
+                new GadgetCost(1, 30 * 100, null),
             } },
         };
 
@@ -37,6 +38,7 @@ namespace Assets.Code.Model {
         static Vector2Int COOR_TUTORIAL_BLOCKER_MARKET = new Vector2Int(0, 8);
         static Vector2Int COOR_TUTORIAL_BLOCKER_POSITION = new Vector2Int(1, 0);
         static Vector2Int COOR_SECOND_TREE = new Vector2Int(5, 0);
+        static Vector2Int COOR_TUTORIAL_FUSER_MARKET = new Vector2Int(-5, 8);
 
         State state;
         public ProgressionPhase phase;
@@ -45,12 +47,17 @@ namespace Assets.Code.Model {
         public Dictionary<EntitySubtype, GadgetCost> gadgetCosts;
         public Dictionary<EntitySubtype, int> gadgetCostIndex;
         public Vector2Int[] highlightCoors;
+        public bool cameraTakeover;
+        public Vector3 cameraTargetPosition;
+        public int timeScaleMinIndex, timeScaleMaxIndex;
 
         public Progression(State state) {
             this.state = state;
             maxCents = WALLET_SIZES[0];
             maxFruit = FRUIT_WALLET_SIZES[0];
             gadgetCosts = new Dictionary<EntitySubtype, GadgetCost>();
+            timeScaleMinIndex = Array.IndexOf(TIMESCALES, 1);
+            timeScaleMaxIndex = timeScaleMinIndex;
 
             state.SpawnTree(COOR_FIRST_TREE, TREE_APPLE, new Vector2Int[] { Vector2Int.right });
             state.SpawnEntity(new EntityMarket(state, COOR_TUTORIAL_FLINGER_MARKET));
@@ -65,12 +72,16 @@ namespace Assets.Code.Model {
             if (phase == ProgressionPhase.TutorialFlinger && state.storedGadgets[EntitySubtype.Flinger] == 0 && state.totalCentsEarned >= 600) {
                 phase = ProgressionPhase.TutorialBlocker;
                 state.RemoveEntityAtCoor(COOR_TUTORIAL_FLINGER_MARKET);
+                state.CleanUpFruits();
                 state.SpawnEntity(new EntityMarket(state, COOR_TUTORIAL_BLOCKER_MARKET));
                 state.StoreGadgetType(EntitySubtype.Blocker);
                 state.StoreGadgetType(EntitySubtype.Flinger);
                 highlightCoors = new Vector2Int[] { COOR_TUTORIAL_BLOCKER_POSITION };
+                cameraTakeover = true;
+                cameraTargetPosition = new Vector3(0, 4, 0);
             }
             if (phase == ProgressionPhase.TutorialBlocker && state.totalCentsEarned >= 1000) {
+                state.CleanUpFruits();
                 state.SpawnTree(COOR_SECOND_TREE, TREE_PEAR, new Vector2Int[] { Vector2Int.left });
                 phase = ProgressionPhase.SecondTree;
                 UnlockPurchase(EntitySubtype.Flinger);
@@ -84,6 +95,10 @@ namespace Assets.Code.Model {
             if (phase == ProgressionPhase.SecondTreeMoney && state.cents >= GADGET_COSTS[EntitySubtype.Fuser][0].cents) {
                 phase = ProgressionPhase.TutorialFuser;
                 state.RemoveEntityAtCoor(COOR_TUTORIAL_BLOCKER_MARKET);
+                state.CleanUpFruits();
+                state.SpawnEntity(new EntityMarket(state, COOR_TUTORIAL_FUSER_MARKET));
+                cameraTakeover = true;
+                cameraTargetPosition = new Vector3(-2.5f, 0, 0);
             }
         }
         void UnlockPurchase(EntitySubtype gadgetType) {

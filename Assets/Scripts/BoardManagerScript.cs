@@ -8,17 +8,21 @@ using UnityEngine.EventSystems;
 public class BoardManagerScript : MonoBehaviour {
     public GameObject prefabEntity;
 
+    public StorageButtonScript storageButtonScript;
+
     Camera cam;
     public State state;
     Dictionary<Entity, EntityScript> entityScripts;
     Entity draggedEntity;
     EntityScript draggedEntityScript;
+    public int timescaleIndex;
 
     void Start() {
         cam = Camera.main;
         state = new State();
         entityScripts = new Dictionary<Entity, EntityScript>();
         EntityCheck();
+        timescaleIndex = state.progression.timeScaleMinIndex;
     }
 
     void Update() {
@@ -69,11 +73,12 @@ public class BoardManagerScript : MonoBehaviour {
             } else {
                 return;
             }
-            
         }
+        // Drop.
         if (!Input.GetMouseButton(0) || !IsDraggableType(draggedEntity.type)) {
+            bool storageHovered = storageButtonScript.hovered;
             draggedEntity.coor = coor;
-            if (!state.SpawnEntity(draggedEntity)) {
+            if (storageHovered || !state.SpawnEntity(draggedEntity)) {
                 state.StoreEntity(draggedEntity);
             }
             EntityCheck();
@@ -107,5 +112,22 @@ public class BoardManagerScript : MonoBehaviour {
         draggedEntity = gadget;
         draggedEntityScript = Instantiate(prefabEntity, transform).GetComponent<EntityScript>();
         draggedEntityScript.Init(gadget);
+    }
+
+    public void SlowDown() {
+        timescaleIndex = Mathf.Max(state.progression.timeScaleMinIndex, timescaleIndex - 1);
+        Time.timeScale = Progression.TIMESCALES[timescaleIndex];
+    }
+    public void SpeedUp() {
+        timescaleIndex = Mathf.Min(timescaleIndex + 1, state.progression.timeScaleMaxIndex);
+        Time.timeScale = Progression.TIMESCALES[timescaleIndex];
+    }
+    public void CleanUpFruits() {
+        state.CleanUpFruits();
+        EntityCheck();
+    }
+    public void RecenterCamera() {
+        state.progression.cameraTakeover = true;
+        state.progression.cameraTargetPosition = Vector3.zero;
     }
 }

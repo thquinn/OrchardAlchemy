@@ -22,4 +22,22 @@ namespace Assets.Code.Model {
             }
         }
     }
+
+    public class FlingerCondition {
+        public FlingerConditionType type;
+        public FlingerConditionOperation operation;
+        public int value;
+
+        public FlingerCondition(FlingerConditionType type, FlingerConditionOperation operation, int value) {
+            this.type = type;
+            this.operation = operation;
+            this.value = value;
+        }
+    }
+    public enum FlingerConditionType {
+        None, Mass, Reactivity
+    }
+    public enum FlingerConditionOperation {
+        Equals, LessThan, GreaterThan
+    }
 }

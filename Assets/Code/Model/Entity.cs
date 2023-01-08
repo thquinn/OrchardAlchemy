@@ -22,8 +22,8 @@ namespace Assets.Code.Model {
         public virtual void TickStart() {
             ticksAlive++;
         }
-        public virtual void TickThrow() { }
         public virtual void TickConsume() { }
+        public virtual void TickThrow() { }
         public virtual void TickSpawn() { }
     }
 
@@ -33,7 +33,7 @@ namespace Assets.Code.Model {
     public enum EntitySubtype {
         None,
         // Gadget subtypes.
-        Blocker, Flinger, Fuser,
+        Blocker, Flinger, Fuser, Lab, Storage,
         // Fixture subtypes.
         Market,
     }
