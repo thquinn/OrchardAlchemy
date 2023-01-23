@@ -15,7 +15,7 @@ public class ConditionalFlingerPanelScript : MonoBehaviour
     EntityFlinger flinger;
 
     void Start() {
-        input.onEndEdit.AddListener(v => SetInputValue(v));
+        input.onEndEdit.AddListener(SetInputValue);
     }
     void Update() {
         State state = boardManagerScript.state;
@@ -62,8 +62,11 @@ public class ConditionalFlingerPanelScript : MonoBehaviour
         SetControls();
         input.ActivateInputField();
     }
-    void SetInputValue(string v) {
-        flinger.condition.value = int.Parse(v);
+    void SetInputValue(string s) {
+        int i;
+        if (int.TryParse(s, out i)) {
+            flinger.condition.value = i;
+        }
         SetControls();
     }
     void SetControls() {
@@ -79,7 +82,7 @@ public class ConditionalFlingerPanelScript : MonoBehaviour
             foreach (GameObject radioFill in radioFillsOperation) {
                 radioFill.SetActive(false);
             }
-            input.text = "";
+            SetText("");
         } else {
             FlingerConditionOperation operation = flinger.condition.operation;
             int operationIndex = (int) operation;
@@ -89,7 +92,7 @@ public class ConditionalFlingerPanelScript : MonoBehaviour
             for (int i = 0; i < radioFillsOperation.Length; i++) {
                 radioFillsOperation[i].SetActive(i == operationIndex);
             }
-            input.text = flinger.condition.value.ToString();
+            SetText(flinger.condition.value.ToString());
         }
         FlingerConditionOperation indexOperation = flinger.condition?.operation ?? FlingerConditionOperation.Equals;
         Vector3 inputPosition = input.transform.parent.position;
@@ -113,5 +116,11 @@ public class ConditionalFlingerPanelScript : MonoBehaviour
     }
     public void ClickGreaterThan() {
         SetConditionOperation(FlingerConditionOperation.GreaterThan);
+    }
+
+    void SetText(string text) {
+        input.onEndEdit.RemoveAllListeners();
+        input.text = text;
+        input.onEndEdit.AddListener(SetInputValue);
     }
 }

@@ -48,6 +48,12 @@ public class BoardManagerScript : MonoBehaviour {
             state.progression.SpawnEpoch();
             EntityCheck();
         }
+        if (Input.GetKeyDown(KeyCode.F6)) {
+            state.progression.researchFlags.Add(ResearchFlags.ApproximateResearch);
+            state.progression.researchFlags.Add(ResearchFlags.ConditionalFlingers);
+            state.progression.researchFlags.Add(ResearchFlags.PrimeBonus);
+            state.progression.researchFlags.Add(ResearchFlags.SuperLemon);
+        }
     }
     void Tick() {
         state.Tick();

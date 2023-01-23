@@ -15,7 +15,7 @@ public class UIScript : MonoBehaviour
         { ProgressionPhase.SecondTreeMoney, "Sell fruit until you can afford a Fuser." },
         { ProgressionPhase.TutorialFuser, "Fuse an apple and pear into a quince,\nthen sell it." },
         { ProgressionPhase.FuserMoney, "Earn money to buy a Lab." },
-        { ProgressionPhase.TutorialResearch, "Each fruit can be researched for a unique effect. Use a Lab to research the quince." },
+        { ProgressionPhase.TutorialResearch, "Each fruit can be researched for a unique bonus. Use a Lab to research the quince." },
         { ProgressionPhase.TutorialResearchAgain, "Use the Lab to research any other fruit." },
     };
 
@@ -48,6 +48,7 @@ public class UIScript : MonoBehaviour
         canvasGroupGadgetDrawerButton.alpha = Mathf.SmoothDamp(canvasGroupGadgetDrawerButton.alpha, showGadgetDrawerButton ? 1 : 0, ref vAlphaGadgetDrawerButton, .2f, float.MaxValue, Time.unscaledDeltaTime);
         lastMoney = Mathf.SmoothDamp(lastMoney, state.cents, ref vMoney, .1f);
         tmpMoney.text = string.Format("${0}<size=40%> max ${1}", (lastMoney / 100).ToString("N2"), state.progression.maxCents / 100);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(tmpMoney.transform.parent as RectTransform);
         // Update research.
         if (state.progression.research != lastResearch) {
             lastResearch = state.progression.research;

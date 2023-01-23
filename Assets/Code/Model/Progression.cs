@@ -15,7 +15,7 @@ namespace Assets.Code.Model {
                 new GadgetCost(999, 5 * 100, null),
             } },
             { EntitySubtype.Flinger, new GadgetCost[] {
-                new GadgetCost(10, 10 * 100, null),
+                new GadgetCost(30, 10 * 100, null),
                 new GadgetCost(20, 10 * 100, new Vector2Int[] { new Vector2Int(9, 1) }),
                 new GadgetCost(999, 20 * 100, new Vector2Int[] { new Vector2Int(9, 2) }),
             } },
@@ -49,11 +49,11 @@ namespace Assets.Code.Model {
             new Vector3Int(5, 1, 1),
         };
         static Vector3Int[] TREE_MINT_APPLE = new Vector3Int[] {
-            new Vector3Int(1, 1, 1),
+            new Vector3Int(1, 2, 1),
             new Vector3Int(4, 1, 1),
         };
         static Vector3Int[] TREE_MINT_PEAR = new Vector3Int[] {
-            new Vector3Int(1, 1, 1),
+            new Vector3Int(1, 2, 1),
             new Vector3Int(5, 1, 1),
         };
         static Vector3Int[] TREE_APPLE_PEAR = new Vector3Int[] {
@@ -71,6 +71,7 @@ namespace Assets.Code.Model {
         static Vector2Int COOR_TUTORIAL_FUSER_MARKET = new Vector2Int(-5, 8);
         static Vector2Int COOR_THIRD_TREE = new Vector2Int(5, 5);
         static Vector2Int COOR_FOURTH_TREE = new Vector2Int(1, -5);
+        static Vector2Int COOR_TUTORIAL_CONDITIONAL_MARKET = new Vector2Int(9, -5);
 
         State state;
         public ProgressionPhase phase;
@@ -153,10 +154,11 @@ namespace Assets.Code.Model {
             }
             if (phase == ProgressionPhase.TutorialResearch && fruitsResearched.Contains(9)) {
                 phase = ProgressionPhase.TutorialResearchAgain;
+                state.SpawnTree(COOR_FOURTH_TREE, TREE_APPLE_PEAR, null);
+                state.SpawnEntity(new EntityMarket(state, COOR_TUTORIAL_CONDITIONAL_MARKET));
             }
             if (phase == ProgressionPhase.TutorialResearchAgain && fruitsResearched.Count >= 2) {
                 phase = ProgressionPhase.TutorialOver;
-                state.SpawnTree(COOR_FOURTH_TREE, TREE_APPLE_PEAR, null);
             }
             if (phase == ProgressionPhase.TutorialOver) {
                 EndlessSpawning();
@@ -216,7 +218,7 @@ namespace Assets.Code.Model {
             lastTotalCentsEarned = state.totalCentsEarned;
             ulong thisEpoch = lastTotalCentsEarned / EPOCH_CENTS;
             while (lastEpoch < thisEpoch) {
-                thisEpoch++;
+                lastEpoch++;
                 SpawnEpoch();
             }
         }

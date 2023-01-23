@@ -42,8 +42,8 @@ public class GadgetRowScript : MonoBehaviour
         }
         cachedCost = cost;
         cachedStoredAmount = storedAmount;
-        while (rectTransformCostSection.childCount > 2) {
-            Destroy(rectTransformCostSection.GetChild(2));
+        for (int i = rectTransformCostSection.childCount - 1; i >= 2; i--) {
+            Destroy(rectTransformCostSection.GetChild(i).gameObject);
         }
         if (cost == null || storedAmount > 0) {
             tmpHeader.text = "Inventory: " + cachedStoredAmount;

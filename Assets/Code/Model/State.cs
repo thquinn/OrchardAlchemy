@@ -109,7 +109,6 @@ namespace Assets.Code.Model {
                 } else {
                     storedFruit[mass]++;
                 }
-                CountProcessedFruit(fruit);
             } else if (entity.type == EntityType.Gadget) {
                 StoreGadgetType(entity.subtype);
             } else {
